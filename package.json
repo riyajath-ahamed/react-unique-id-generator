@@ -1,0 +1,23 @@
+{
+  "name": "react-unique-id-generator",
+  "version": "1.0.0",
+  "description": "React Unique ID Generator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "id",
+    "react",
+    "react-id",
+    "unique-id",
+    "id-generator"
+  ],
+  "author": "Riyajath Ahamed",
+  "license": "MIT",
+  "dependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
