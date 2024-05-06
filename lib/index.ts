@@ -1,6 +1,3 @@
-import nextId, { resetId, setPrefix } from "./nextId";
-import useId from "./useid";
-import generateUniqueId from "./custFormat";
+import nextId, { resetId, setPrefix, setSuffix } from "./nextId";
 
-
-export { nextId as default, resetId, setPrefix, useId , generateUniqueId };
+export { nextId as default, resetId, setPrefix, setSuffix};
