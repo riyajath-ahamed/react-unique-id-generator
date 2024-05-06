@@ -2,7 +2,7 @@
   "name": "react-unique-id-generator",
   "version": "1.0.0",
   "description": "React Unique ID Generator",
-  "main": "lib/index.ts",
+  "main": "./lib/index.ts",
   "scripts": {
     "dev": "nodemon lib/index.ts",
     "start": "node lib/index.ts",
