@@ -1,4 +1,4 @@
-let globalPrefix = "id";
+let globalPrefix = "";
 let lastId = 0;
 export default function nextId(localPrefix?: string | null): string {
   lastId++;
@@ -11,4 +11,8 @@ export const resetId = (): void => {
 
 export const setPrefix = (newPrefix: string): void => {
   globalPrefix = newPrefix;
+};
+
+export const setSuffix = (newSuffix: string): void => {
+  globalPrefix = newSuffix;
 };
