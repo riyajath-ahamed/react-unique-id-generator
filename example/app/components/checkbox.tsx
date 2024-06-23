@@ -1,9 +1,9 @@
 import React from "react";
-import  nextId, { setSuffix }  from "../../../lib/index";
+import  nextId, { setGlobalSuffix }  from "../../../lib/index";
 
 const Checkbox: React.FC = () => {
 
-setSuffix("-checkbox");
+  setGlobalSuffix("-checkbox");
 
   return (
     <div>

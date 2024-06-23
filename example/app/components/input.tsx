@@ -1,9 +1,9 @@
 import React from "react";
-import  nextId, { resetId, setPrefix }  from "../../../lib/index";
+import  nextId, { resetId, setGlobalPrefix }  from "../../../lib/index";
 
 const Input: React.FC = () => {
     resetId();
-    setPrefix("input-");
+    setGlobalPrefix("input-");
     return (
       <div>
         <label >Input with id:{nextId()} </label>
