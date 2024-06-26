@@ -2,8 +2,10 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
+        "baseUrl": "./lib",
         "strict": true,
         "esModuleInterop": true
     },
-    "exclude": ["node_modules", "example"]
+    "exclude": ["node_modules", "example"],
+    "include":["lib"]
 }
