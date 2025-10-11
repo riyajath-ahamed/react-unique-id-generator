@@ -1,16 +1,22 @@
 {
   "name": "react-unique-id-generator",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "React Unique ID Generator",
-  "main": "./lib/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
-    "dev": "nodemon lib/index.ts",
-    "start": "node lib/index.ts",
-    "test": "echo \"Error: no test specified\" ",
-    "build": "webpack --config webpack.config.js"
+    "build": "npm run build:ts && npm run build:webpack",
+    "build:ts": "tsc",
+    "build:webpack": "webpack --config webpack.config.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "id",
@@ -19,19 +25,26 @@
     "unique-id",
     "id-generator"
   ],
-  "author": "Riyajath Ahamed",
+  "author": "riyajath-ahamed <riyajath.ahamed@gmail.com> (https://github.com/riyajath-ahamed)",
   "license": "MIT",
-  "dependencies": {
-    "nodemon": "^3.1.0",
-    "react": "^18.2.0",
-    "ts-loader": "^9.5.1"
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "bugs": {
+    "url": "https://github.com/riyajath-ahamed/react-unique-id-generator/issues"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.3.1",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.2.79",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "react": "^18.2.0",
     "react-test-renderer": "^18.2.0",
     "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "webpack": "^5.91.0",
