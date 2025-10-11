@@ -1,11 +1,21 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "baseUrl": "./lib",
-        "strict": true,
-        "esModuleInterop": true
-    },
-    "exclude": ["node_modules", "example"],
-    "include":["lib"]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es2015", "dom"],
+    "outDir": "./dist",
+    "rootDir": "./lib",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["lib/**/*"],
+  "exclude": ["node_modules", "example", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

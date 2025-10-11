@@ -1,10 +1,18 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'production',
   entry: './lib/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: 'index.esm.js',
+    library: {
+      type: 'module'
+    },
+    globalObject: 'this'
+  },
+  experiments: {
+    outputModule: true
   },
   module: {
     rules: [
@@ -18,4 +26,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', 'jsx'],
   },
+  externals: {
+    'react': 'react'
+  }
 };
