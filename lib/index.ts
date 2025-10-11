@@ -1,3 +1,18 @@
-import nextId, { resetId, setGlobalPrefix, setGlobalSuffix } from "./nextId";
+import nextId, { 
+  resetId, 
+  setGlobalPrefix, 
+  setGlobalSuffix, 
+  getCurrentId, 
+  setId, 
+  generateId 
+} from "./nextId";
 
-export { nextId as default, resetId, setGlobalPrefix, setGlobalSuffix};
+export { 
+  nextId as default, 
+  resetId, 
+  setGlobalPrefix, 
+  setGlobalSuffix, 
+  getCurrentId, 
+  setId, 
+  generateId 
+};
