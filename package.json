@@ -1,7 +1,7 @@
 {
   "name": "react-unique-id-generator",
-  "version": "1.3.1",
-  "description": "React Unique ID Generator",
+  "version": "1.4.0",
+  "description": "A lightweight, zero-dependency library for generating unique, sequential IDs in React — with hooks, custom prefix/suffix, and SSR support",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
@@ -25,12 +25,17 @@
     "prepublishOnly": "npm run build",
     "clean": "rm -rf dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riyajath-ahamed/react-unique-id-generator.git"
+  },
   "keywords": [
     "id",
     "react",
     "react-id",
     "unique-id",
-    "id-generator"
+    "id-generator",
+    "typescript"
   ],
   "author": "riyajath-ahamed <riyajath.ahamed@gmail.com> (https://github.com/riyajath-ahamed)",
   "license": "MIT",
@@ -40,6 +45,7 @@
   "bugs": {
     "url": "https://github.com/riyajath-ahamed/react-unique-id-generator/issues"
   },
+  "homepage": "https://github.com/riyajath-ahamed/react-unique-id-generator#readme",
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.3.1",
