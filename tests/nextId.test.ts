@@ -165,6 +165,14 @@ describe('nextId', () => {
       expect(getCurrentId()).toBe(0);
     });
 
+    test('should handle 0 as an explicit reset value', () => {
+      nextId();
+      nextId();
+      setId(0);
+      expect(getCurrentId()).toBe(0);
+      expect(nextId()).toBe('1');
+    });
+
     test('should handle decimal values by flooring', () => {
       setId(5.7);
       expect(getCurrentId()).toBe(5);
@@ -201,6 +209,13 @@ describe('nextId', () => {
       generateId('test-', '-id');
       expect(getCurrentId()).toBe(1);
       expect(nextId()).toBe('2');
+    });
+
+    test('should ignore global prefix and suffix', () => {
+      setGlobalPrefix('global-');
+      setGlobalSuffix('-global');
+      expect(generateId('own-', '-own')).toBe('own-1-own');
+      expect(generateId()).toBe('2');
     });
   });
 
