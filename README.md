@@ -19,6 +19,7 @@ React 18 ships a built-in `useId()` hook, but it has limitations:
 | Counter reset | Yes | No |
 | Works in React 16+ | Yes | React 18+ only |
 | Non-component usage | Yes | Hooks only |
+| React hooks (`useUniqueId`) | Yes | Yes |
 | Predictable format | Yes (`prefix-1`) | Opaque (`:r0:`) |
 | Zero runtime deps | Yes | Built-in |
 
@@ -69,6 +70,48 @@ function Field({ label }: { label: string }) {
 The same `id` value is used for both the `label` and the `input`, ensuring correct accessibility linkage every time.
 
 ## API Reference
+
+### Hooks
+
+#### `useUniqueId(localPrefix?: string): string`
+
+React hook that generates a **stable** unique ID for a component instance. The ID is created once on mount and remains the same across re-renders.
+
+```tsx
+import { useUniqueId } from 'react-unique-id-generator';
+
+function MyComponent() {
+  const id = useUniqueId('my-input-');
+  return (
+    <div>
+      <label htmlFor={id}>Name</label>
+      <input id={id} />
+    </div>
+  );
+}
+```
+
+#### `useUniqueIds(count: number, localPrefix?: string): string[]`
+
+React hook that generates multiple stable unique IDs at once. Useful for forms with several labeled elements.
+
+```tsx
+import { useUniqueIds } from 'react-unique-id-generator';
+
+function LoginForm() {
+  const [emailId, passwordId] = useUniqueIds(2, 'login-');
+  return (
+    <form>
+      <label htmlFor={emailId}>Email</label>
+      <input id={emailId} type="email" />
+      <label htmlFor={passwordId}>Password</label>
+      <input id={passwordId} type="password" />
+    </form>
+  );
+}
+```
+
+### Functions
 
 ### `nextId(localPrefix?: string | null): string`
 
@@ -399,6 +442,13 @@ Bug reports and feature requests can be filed at the [issue tracker](https://git
 MIT License — see [LICENSE](LICENSE) for details.
 
 ## Changelog
+
+### v1.4.0
+- Added `useUniqueId()` React hook for stable, component-scoped IDs
+- Added `useUniqueIds()` React hook for generating multiple stable IDs at once
+- Added input validation warnings in development mode (non-breaking)
+- Enhanced JSDoc comments for better IDE autocomplete and IntelliSense
+- Improved example app to demonstrate both imperative and hook-based usage
 
 ### v1.3.0
 - Migrated build toolchain from Webpack to `tsup` (esbuild-based)
