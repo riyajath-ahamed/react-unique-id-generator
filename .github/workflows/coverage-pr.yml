@@ -1,0 +1,127 @@
+name: PR Coverage Report
+
+on:
+  pull_request:
+    branches: [main, beta, release]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --coverageReporters=json-summary --coverageReporters=text | tee coverage-output.txt
+
+      - name: Generate coverage comment
+        id: coverage
+        run: |
+          # Read the JSON summary
+          SUMMARY=$(cat coverage/coverage-summary.json)
+
+          # Extract totals
+          STMTS=$(echo "$SUMMARY" | jq '.total.statements.pct')
+          BRANCH=$(echo "$SUMMARY" | jq '.total.branches.pct')
+          FUNCS=$(echo "$SUMMARY" | jq '.total.functions.pct')
+          LINES=$(echo "$SUMMARY" | jq '.total.lines.pct')
+
+          # Determine badge color
+          get_color() {
+            local pct=$1
+            if (( $(echo "$pct >= 90" | bc -l) )); then echo "🟢";
+            elif (( $(echo "$pct >= 70" | bc -l) )); then echo "🟡";
+            else echo "🔴"; fi
+          }
+
+          STMTS_BADGE=$(get_color "$STMTS")
+          BRANCH_BADGE=$(get_color "$BRANCH")
+          FUNCS_BADGE=$(get_color "$FUNCS")
+          LINES_BADGE=$(get_color "$LINES")
+
+          # Build per-file table rows
+          FILE_ROWS=""
+          for file in $(echo "$SUMMARY" | jq -r 'keys[] | select(. != "total")'); do
+            FNAME=$(basename "$file")
+            F_STMTS=$(echo "$SUMMARY" | jq -r --arg f "$file" '.[$f].statements.pct')
+            F_BRANCH=$(echo "$SUMMARY" | jq -r --arg f "$file" '.[$f].branches.pct')
+            F_FUNCS=$(echo "$SUMMARY" | jq -r --arg f "$file" '.[$f].functions.pct')
+            F_LINES=$(echo "$SUMMARY" | jq -r --arg f "$file" '.[$f].lines.pct')
+            F_BADGE=$(get_color "$F_LINES")
+            FILE_ROWS="$FILE_ROWS| $F_BADGE \`$FNAME\` | $F_STMTS% | $F_BRANCH% | $F_FUNCS% | $F_LINES% |
+          "
+          done
+
+          # Extract test summary from output
+          TESTS_PASSED=$(grep -oP 'Tests:\s+\K\d+ passed' coverage-output.txt || echo "N/A")
+          SUITES_PASSED=$(grep -oP 'Test Suites:\s+\K\d+ passed' coverage-output.txt || echo "N/A")
+
+          # Create the comment body
+          cat > comment-body.md << 'COMMENT_EOF'
+          ## 📊 Test Coverage Report
+
+          ### Summary
+
+          | Metric | Coverage |
+          |---|---|
+          COMMENT_EOF
+
+          echo "| ${STMTS_BADGE} Statements | **${STMTS}%** |" >> comment-body.md
+          echo "| ${BRANCH_BADGE} Branches | **${BRANCH}%** |" >> comment-body.md
+          echo "| ${FUNCS_BADGE} Functions | **${FUNCS}%** |" >> comment-body.md
+          echo "| ${LINES_BADGE} Lines | **${LINES}%** |" >> comment-body.md
+
+          cat >> comment-body.md << 'COMMENT_EOF'
+
+          ### Per-file Breakdown
+
+          | File | Stmts | Branch | Funcs | Lines |
+          |---|---|---|---|---|
+          COMMENT_EOF
+
+          echo "$FILE_ROWS" >> comment-body.md
+
+          cat >> comment-body.md << COMMENT_EOF
+
+          ### Test Results
+
+          - **Suites:** ${SUITES_PASSED}
+          - **Tests:** ${TESTS_PASSED}
+
+          ---
+          <sub>Coverage thresholds: 🟢 ≥ 90% | 🟡 ≥ 70% | 🔴 < 70%</sub>
+          COMMENT_EOF
+
+      - name: Find existing coverage comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '📊 Test Coverage Report'
+
+      - name: Post or update coverage comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: comment-body.md
+          edit-mode: replace
