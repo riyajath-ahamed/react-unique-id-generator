@@ -1,18 +1,22 @@
-import nextId, { 
-  resetId, 
-  setGlobalPrefix, 
-  setGlobalSuffix, 
-  getCurrentId, 
-  setId, 
-  generateId 
+import nextId, {
+  resetId,
+  setGlobalPrefix,
+  setGlobalSuffix,
+  getCurrentId,
+  setId,
+  generateId
 } from "./nextId";
 
-export { 
-  nextId as default, 
-  resetId, 
-  setGlobalPrefix, 
-  setGlobalSuffix, 
-  getCurrentId, 
-  setId, 
-  generateId 
+import { useUniqueId, useUniqueIds } from "./hooks";
+
+export {
+  nextId as default,
+  resetId,
+  setGlobalPrefix,
+  setGlobalSuffix,
+  getCurrentId,
+  setId,
+  generateId,
+  useUniqueId,
+  useUniqueIds
 };
