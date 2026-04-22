@@ -1,0 +1,358 @@
+# react-unique-id-generator - Full API Reference
+
+> Unique IDs for React. Readable. Predictable. SSR-safe.
+
+Version: 2.0.0
+License: MIT
+Peer dependency: react >=16.8.0
+Zero runtime dependencies.
+Bundle: ESM + CJS, tree-shakeable (sideEffects: false)
+
+## Install
+
+npm install react-unique-id-generator
+
+## Imports
+
+```tsx
+import {
+  IdProvider,
+  useUniqueId,
+  useUniqueIds,
+  useIdContext,
+  createServerIdManager,
+  generateAutomationId,
+  useAutomationId,
+  AutomationIdPool,
+  resetAutomationCounter,
+} from 'react-unique-id-generator';
+
+// Legacy (deprecated, still functional):
+import nextId, {
+  resetId,
+  setGlobalPrefix,
+  setGlobalSuffix,
+  getCurrentId,
+  setId,
+  generateId,
+} from 'react-unique-id-generator';
+```
+
+## TypeScript Types
+
+```tsx
+import type {
+  IdProviderProps,
+  IdContextValue,
+  ServerIdManager,
+  ServerIdManagerOptions,
+  AutomationIdStrategy,   // 'sequential' | 'kebab-case' | 'camelCase' | 'custom'
+  AutomationIdOptions,
+} from 'react-unique-id-generator';
+```
+
+---
+
+## Provider API
+
+### `<IdProvider>`
+
+React context provider that scopes ID state (counter, prefix, suffix) to its subtree.
+Each provider maintains an independent counter. Supports nesting and parallel providers.
+
+Props:
+- `prefix?: string` (default: `""`) - Prefix applied to all IDs within the provider
+- `suffix?: string` (default: `""`) - Suffix appended to all IDs within the provider
+- `startId?: number` (default: `0`) - Initial counter value (first ID = startId + 1)
+- `children: ReactNode`
+
+```tsx
+// Basic usage
+<IdProvider prefix="app-" suffix="-id">
+  <YourComponent />
+</IdProvider>
+
+// Nested providers (independent scopes)
+<IdProvider prefix="page-">
+  <Header />          {/* useUniqueId() => "page-1" */}
+  <IdProvider prefix="modal-">
+    <ModalContent />  {/* useUniqueId() => "modal-1" */}
+  </IdProvider>
+  <Footer />          {/* useUniqueId() => "page-2" */}
+</IdProvider>
+
+// Parallel providers (fully isolated)
+<IdProvider prefix="sidebar-">
+  <NavItem />   {/* "sidebar-1" */}
+</IdProvider>
+<IdProvider prefix="main-">
+  <Card />      {/* "main-1" */}
+</IdProvider>
+```
+
+### `useIdContext(): IdContextValue | null`
+
+Access the current provider's context value. Returns `null` when called outside a provider.
+
+```tsx
+const ctx = useIdContext();
+// ctx.prefix, ctx.suffix, ctx.nextId(localPrefix?)
+```
+
+---
+
+## Hooks
+
+### `useUniqueId(localPrefix?: string): string`
+
+Generates a stable unique ID for a component instance. Created once on mount, stable across re-renders.
+When inside an `<IdProvider>`, scoped to that provider. Outside a provider, falls back to global state.
+
+The `localPrefix` argument overrides the provider's prefix for that call.
+
+```tsx
+function MyComponent() {
+  const id = useUniqueId('my-input-');  // "my-input-1"
+  return <input id={id} />;
+}
+```
+
+### `useUniqueIds(count: number, localPrefix?: string): string[]`
+
+Generates multiple stable unique IDs at once.
+
+```tsx
+function LoginForm() {
+  const [emailId, passwordId] = useUniqueIds(2, 'login-');
+  return (
+    <form>
+      <label htmlFor={emailId}>Email</label>
+      <input id={emailId} type="email" />
+      <label htmlFor={passwordId}>Password</label>
+      <input id={passwordId} type="password" />
+    </form>
+  );
+}
+```
+
+---
+
+## Server-Side Rendering
+
+### `createServerIdManager(options?): ServerIdManager`
+
+Creates an isolated ID manager for SSR. Each request should create its own manager.
+
+Options:
+- `prefix?: string` (default: `""`)
+- `suffix?: string` (default: `""`)
+- `startId?: number` (default: `0`)
+
+ServerIdManager methods:
+- `nextId(localPrefix?: string): string` - Generate the next ID
+- `resetId(): void` - Reset counter to 0
+- `getCurrentId(): number` - Get current counter value
+- `setId(id: number): void` - Set counter to specific value
+
+```ts
+// Express middleware example
+app.get('*', (req, res) => {
+  const ids = createServerIdManager({ prefix: 'ssr-' });
+  const id1 = ids.nextId();         // "ssr-1"
+  const id2 = ids.nextId();         // "ssr-2"
+  const id3 = ids.nextId('nav-');   // "nav-3"
+  // Render your app...
+});
+
+// Next.js server action
+export async function generatePageIds() {
+  const ids = createServerIdManager({ prefix: 'page-', suffix: '-el' });
+  return {
+    heroId: ids.nextId(),      // "page-1-el"
+    contentId: ids.nextId(),   // "page-2-el"
+  };
+}
+```
+
+---
+
+## Automation Testing
+
+### `generateAutomationId(componentName: string, options?: AutomationIdOptions): string`
+
+Generate a single automation ID with a naming strategy.
+
+Options:
+- `strategy?: 'sequential' | 'kebab-case' | 'camelCase' | 'custom'` (default: `'sequential'`)
+- `prefix?: string` (default: `""`)
+- `separator?: string` (default: `"-"`)
+- `customFn?: (name: string, index: number) => string` (required for `'custom'` strategy)
+
+```ts
+generateAutomationId('Button')                                    // "Button-1"
+generateAutomationId('UserProfile', { strategy: 'kebab-case' })   // "user-profile-2"
+generateAutomationId('myButton', { strategy: 'camelCase' })       // "myButton-3"
+generateAutomationId('Btn', { prefix: 'qa-', separator: '_' })   // "qa-Btn_4"
+
+// Custom strategy
+generateAutomationId('LoginForm', {
+  strategy: 'custom',
+  customFn: (name, index) => `e2e__${name}__${index}`,
+});
+// => "e2e__LoginForm__5"
+```
+
+### `useAutomationId(componentName: string, options?: AutomationIdOptions): string`
+
+React hook version. Returns a stable automation ID that persists across re-renders.
+
+```tsx
+function SubmitButton() {
+  const testId = useAutomationId('SubmitButton', { strategy: 'kebab-case' });
+  return <button data-testid={testId}>Submit</button>;
+  // => <button data-testid="submit-button-1">Submit</button>
+}
+```
+
+### `AutomationIdPool`
+
+Pre-allocates a pool of automation IDs for performance in large applications.
+
+```ts
+const pool = new AutomationIdPool(100, 'component', {
+  strategy: 'kebab-case',
+  prefix: 'test-',
+});
+
+const id1 = pool.acquire();   // "test-component-1"
+const id2 = pool.acquire();   // "test-component-2"
+pool.release(id1);             // Return to pool
+const id3 = pool.acquire();   // "test-component-1" (reused)
+pool.drain();                  // Clear all
+pool.size;                     // Number of available IDs
+```
+
+### `resetAutomationCounter(): void`
+
+Resets the global automation counter to 0. Useful in test setup.
+
+```ts
+beforeEach(() => {
+  resetAutomationCounter();
+});
+```
+
+---
+
+## Legacy Functions (Deprecated)
+
+These use global state. They emit a one-time deprecation warning in development.
+Use `<IdProvider>` and hooks instead for SSR safety.
+
+### `nextId(localPrefix?: string | null): string`
+
+```ts
+nextId()           // "1"
+nextId('input-')   // "input-2"
+```
+
+### `generateId(prefix?: string, suffix?: string): string`
+
+```ts
+generateId('btn-', '-primary') // "btn-1-primary"
+```
+
+### `setGlobalPrefix(prefix: string): void`
+
+Use `<IdProvider prefix="...">` instead.
+
+### `setGlobalSuffix(suffix: string): void`
+
+Use `<IdProvider suffix="...">` instead.
+
+### `resetId(): void`
+
+Reset counter to 0.
+
+### `getCurrentId(): number`
+
+Get current counter value.
+
+### `setId(id: number): void`
+
+Set counter to specific value. Negatives clamped to 0, decimals floored.
+
+---
+
+## Common Patterns
+
+### Accessible form fields (label + input linking)
+
+```tsx
+<IdProvider>
+  <TextField label="Email" type="email" />
+  <TextField label="Password" type="password" />
+</IdProvider>
+
+function TextField({ label, type }) {
+  const id = useUniqueId('field-');
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type={type} />
+    </div>
+  );
+}
+```
+
+### ARIA attributes (dialog labeling)
+
+```tsx
+function Modal({ title, children }) {
+  const [titleId, descId] = useUniqueIds(2, 'modal-');
+  return (
+    <div role="dialog" aria-labelledby={titleId} aria-describedby={descId}>
+      <h2 id={titleId}>{title}</h2>
+      <p id={descId}>{children}</p>
+    </div>
+  );
+}
+```
+
+### Next.js App Router (root layout)
+
+```tsx
+// app/layout.tsx
+import { IdProvider } from 'react-unique-id-generator';
+
+export default function RootLayout({ children }) {
+  return (
+    <html><body>
+      <IdProvider prefix="app-">{children}</IdProvider>
+    </body></html>
+  );
+}
+```
+
+### E2E test IDs with Playwright/Cypress
+
+```tsx
+function LoginButton() {
+  const testId = useAutomationId('LoginButton', { strategy: 'kebab-case' });
+  return <button data-testid={testId}>Log in</button>;
+  // data-testid="login-button-1"
+}
+
+// In Playwright:
+// await page.getByTestId('login-button-1').click();
+```
+
+---
+
+## Framework Compatibility
+
+- Next.js (App Router & Pages Router): Use <IdProvider> in root layout
+- Vite + React: Works out of the box (ESM)
+- Create React App: Works out of the box
+- Remix: Use <IdProvider> in root route
+- React 16.8 through React 19: Supported
