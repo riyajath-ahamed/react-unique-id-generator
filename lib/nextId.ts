@@ -3,6 +3,18 @@ let globalSuffix = "";
 let lastId = 0;
 
 const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
+const deprecationWarned = new Set<string>();
+
+function warnDeprecated(name: string, alternative: string): void {
+  if (isDev && !deprecationWarned.has(name)) {
+    deprecationWarned.add(name);
+    console.warn(
+      `[react-unique-id-generator] DEPRECATED: ${name}() uses global state. ` +
+      `Use ${alternative} instead for SSR safety. ` +
+      `Global API will be removed in a future major version.`
+    );
+  }
+}
 
 /**
  * Generates the next unique ID. Accepts an optional prefix that overrides the
@@ -60,6 +72,7 @@ export const resetId = (): void => {
  * ```
  */
 export const setGlobalPrefix = (newPrefix: string): void => {
+  warnDeprecated('setGlobalPrefix', '<IdProvider prefix="...">');
   if (isDev && newPrefix !== undefined && newPrefix !== null && typeof newPrefix !== 'string') {
     console.warn(
       `[react-unique-id-generator] setGlobalPrefix() expected a string, but received ${typeof newPrefix}.`
@@ -81,6 +94,7 @@ export const setGlobalPrefix = (newPrefix: string): void => {
  * ```
  */
 export const setGlobalSuffix = (newSuffix: string): void => {
+  warnDeprecated('setGlobalSuffix', '<IdProvider suffix="...">');
   if (isDev && newSuffix !== undefined && newSuffix !== null && typeof newSuffix !== 'string') {
     console.warn(
       `[react-unique-id-generator] setGlobalSuffix() expected a string, but received ${typeof newSuffix}.`

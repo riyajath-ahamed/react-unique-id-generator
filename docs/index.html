@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>react-unique-id-generator</title>
+  <meta name="description" content="A lightweight, zero-dependency library for generating unique, readable, and SSR-safe IDs in React applications." />
+  <meta name="keywords" content="react, unique id, id generator, SSR, hooks, typescript, accessibility" />
+  <meta property="og:title" content="react-unique-id-generator" />
+  <meta property="og:description" content="Unique IDs for React. Readable. Predictable. SSR-safe." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">react-unique-id-generator</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#examples">Examples</a></li>
+        <li><a href="#migration">Migration</a></li>
+        <li>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" class="nav-github" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">v2.0</div>
+      <h1 class="hero-title">react-unique-id-generator</h1>
+      <p class="hero-subtitle">Readable. Predictable. SSR-safe.</p>
+      <p class="hero-desc">Zero-dependency unique ID generation for React. Custom prefixes, provider-scoped counters, SSR isolation, and automation test IDs.</p>
+      <div class="hero-actions">
+        <a href="#quick-start" class="btn btn-primary">Get Started</a>
+        <div class="hero-install">
+          <code id="install-cmd">npm install react-unique-id-generator</code>
+          <button class="copy-btn" data-copy="npm install react-unique-id-generator" aria-label="Copy install command">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">0</span>
+          <span class="stat-label">Dependencies</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">16.8+</span>
+          <span class="stat-label">React</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">100%</span>
+          <span class="stat-label">Coverage</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">SSR</span>
+          <span class="stat-label">Safe</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="problem">
+    <div class="container">
+      <h2 class="section-title">The Problem</h2>
+      <p class="section-subtitle">React's <code>useId()</code> gives you <code>:r0:</code>. No prefix, no scoping, no control. Global counters leak across SSR requests.</p>
+      <div class="comparison">
+        <div class="comparison-card comparison-before">
+          <div class="comparison-header">React useId</div>
+          <pre><code><span class="kw">function</span> <span class="fn">Form</span>() {
+  <span class="kw">const</span> id = <span class="fn">useId</span>();          <span class="cm">// ":r0:"</span>
+  <span class="kw">return</span> &lt;<span class="tag">input</span> <span class="attr">id</span>={id} /&gt;;   <span class="cm">// no prefix, no control</span>
+}</code></pre>
+        </div>
+        <div class="comparison-card comparison-after">
+          <div class="comparison-header">This library</div>
+          <pre><code><span class="kw">function</span> <span class="fn">Form</span>() {
+  <span class="kw">const</span> id = <span class="fn">useUniqueId</span>(<span class="str">'email-'</span>);  <span class="cm">// "email-1"</span>
+  <span class="kw">return</span> &lt;<span class="tag">input</span> <span class="attr">id</span>={id} /&gt;;         <span class="cm">// readable</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="features">
+    <div class="container">
+      <h2 class="section-title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Provider-Scoped</h3>
+          <p>Isolate ID counters per subtree with <code>&lt;IdProvider&gt;</code>. Nested providers, zero collisions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>SSR-Safe</h3>
+          <p>Per-request server ID manager. No cross-request state leaks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h3>Automation-Ready</h3>
+          <p>Deterministic <code>data-testid</code> with kebab-case, camelCase, or custom strategies.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+          </div>
+          <h3>Lightweight</h3>
+          <p>Zero dependencies. Tree-shakeable ESM and CJS.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </div>
+          <h3>TypeScript</h3>
+          <p>Written in TypeScript. Ships declarations and source maps.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Well-Tested</h3>
+          <p>100% coverage. Provider isolation, SSR, hooks, edge cases.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="comparison">
+    <div class="container">
+      <h2 class="section-title">Comparison</h2>
+      <p class="section-subtitle">vs React's built-in <code>useId</code></p>
+      <div class="table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>This library</th>
+              <th>React useId</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Custom prefix/suffix</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Provider-scoped IDs</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>SSR-safe with isolation</td><td class="yes">Yes</td><td class="partial">Partial</td></tr>
+            <tr><td>Automation test IDs</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Server ID manager</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Counter reset</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>React 16+ support</td><td class="yes">Yes</td><td class="no">18+ only</td></tr>
+            <tr><td>Non-component usage</td><td class="yes">Yes</td><td class="no">Hooks only</td></tr>
+            <tr><td>Predictable format</td><td class="yes">prefix-1</td><td class="no">:r0:</td></tr>
+            <tr><td>Zero runtime deps</td><td class="yes">Yes</td><td class="yes">Built-in</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="quick-start">
+    <div class="container">
+      <h2 class="section-title">Quick Start</h2>
+
+      <div class="tabs" id="quickstart-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="provider">Provider</button>
+          <button class="tab-btn" data-tab="simple">Legacy</button>
+        </div>
+        <div class="tab-panel active" data-panel="provider">
+          <pre><code><span class="kw">import</span> { <span class="fn">IdProvider</span>, <span class="fn">useUniqueId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="tag">IdProvider</span> <span class="attr">prefix</span>=<span class="str">"app-"</span>&gt;
+      &lt;<span class="tag">Form</span> /&gt;
+    &lt;/<span class="tag">IdProvider</span>&gt;
+  );
+}
+
+<span class="kw">function</span> <span class="fn">Form</span>() {
+  <span class="kw">const</span> emailId = <span class="fn">useUniqueId</span>(<span class="str">'email-'</span>);      <span class="cm">// "email-1"</span>
+  <span class="kw">const</span> passwordId = <span class="fn">useUniqueId</span>(<span class="str">'password-'</span>); <span class="cm">// "password-2"</span>
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag">form</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={emailId}&gt;Email&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={emailId} <span class="attr">type</span>=<span class="str">"email"</span> /&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={passwordId}&gt;Password&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={passwordId} <span class="attr">type</span>=<span class="str">"password"</span> /&gt;
+    &lt;/<span class="tag">form</span>&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="tab-panel" data-panel="simple">
+          <pre><code><span class="kw">import</span> nextId <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">Field</span>({ label }: { label: <span class="type">string</span> }) {
+  <span class="kw">const</span> id = <span class="fn">nextId</span>(<span class="str">'field-'</span>);  <span class="cm">// "field-1", "field-2", ...</span>
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={id}&gt;{label}&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={id} <span class="attr">type</span>=<span class="str">"text"</span> /&gt;
+    &lt;/<span class="tag">div</span>&gt;
+  );
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="api">
+    <div class="container">
+      <h2 class="section-title">API</h2>
+
+      <div class="tabs" id="api-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="api-provider">Provider</button>
+          <button class="tab-btn" data-tab="api-hooks">Hooks</button>
+          <button class="tab-btn" data-tab="api-ssr">SSR</button>
+          <button class="tab-btn" data-tab="api-automation">Automation</button>
+          <button class="tab-btn" data-tab="api-legacy">Legacy</button>
+        </div>
+
+        <div class="tab-panel active" data-panel="api-provider">
+          <div class="api-entry">
+            <h3><code>&lt;IdProvider&gt;</code></h3>
+            <p>Context provider that scopes ID state to its subtree. Each provider has an independent counter.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td><td>Prefix for all IDs in this scope</td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td><td>Suffix for all IDs in this scope</td></tr>
+                  <tr><td><code>startId</code></td><td><code>number</code></td><td><code>0</code></td><td>Initial counter value</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code>&lt;<span class="tag">IdProvider</span> <span class="attr">prefix</span>=<span class="str">"page-"</span>&gt;
+  &lt;<span class="tag">Header</span> /&gt;          <span class="cm">{/* "page-1" */}</span>
+  &lt;<span class="tag">IdProvider</span> <span class="attr">prefix</span>=<span class="str">"modal-"</span>&gt;
+    &lt;<span class="tag">ModalContent</span> /&gt;  <span class="cm">{/* "modal-1" */}</span>
+  &lt;/<span class="tag">IdProvider</span>&gt;
+  &lt;<span class="tag">Footer</span> /&gt;          <span class="cm">{/* "page-2" */}</span>
+&lt;/<span class="tag">IdProvider</span>&gt;</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdContext(): IdContextValue | null</code></h3>
+            <p>Access the current provider's context. Returns <code>null</code> outside a provider.</p>
+            <pre><code><span class="kw">const</span> ctx = <span class="fn">useIdContext</span>();
+<span class="kw">if</span> (ctx) console.<span class="fn">log</span>(ctx.prefix);</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-hooks">
+          <div class="api-entry">
+            <h3><code>useUniqueId(localPrefix?: string): string</code></h3>
+            <p>Stable unique ID on mount. Persists across re-renders.</p>
+            <pre><code><span class="kw">function</span> <span class="fn">MyInput</span>() {
+  <span class="kw">const</span> id = <span class="fn">useUniqueId</span>(<span class="str">'input-'</span>);  <span class="cm">// "input-1"</span>
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={id}&gt;Name&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={id} /&gt;
+    &lt;/<span class="tag">div</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useUniqueIds(count: number, localPrefix?: string): string[]</code></h3>
+            <p>Multiple stable IDs at once.</p>
+            <pre><code><span class="kw">const</span> [emailId, passId] = <span class="fn">useUniqueIds</span>(<span class="num">2</span>, <span class="str">'login-'</span>);
+<span class="cm">// ["login-1", "login-2"]</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-ssr">
+          <div class="api-entry">
+            <h3><code>createServerIdManager(options?): ServerIdManager</code></h3>
+            <p>Isolated ID manager for SSR. One instance per request.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td></tr>
+                  <tr><td><code>startId</code></td><td><code>number</code></td><td><code>0</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">createServerIdManager</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+app.<span class="fn">get</span>(<span class="str">'*'</span>, (req, res) =&gt; {
+  <span class="kw">const</span> ids = <span class="fn">createServerIdManager</span>({ prefix: <span class="str">'ssr-'</span> });
+
+  <span class="kw">const</span> headerId  = ids.<span class="fn">nextId</span>();        <span class="cm">// "ssr-1"</span>
+  <span class="kw">const</span> contentId = ids.<span class="fn">nextId</span>();        <span class="cm">// "ssr-2"</span>
+  <span class="kw">const</span> navId     = ids.<span class="fn">nextId</span>(<span class="str">'nav-'</span>);  <span class="cm">// "nav-3"</span>
+});</code></pre>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>nextId(localPrefix?)</code></td><td><code>string</code></td><td>Next ID</td></tr>
+                  <tr><td><code>resetId()</code></td><td><code>void</code></td><td>Reset counter</td></tr>
+                  <tr><td><code>getCurrentId()</code></td><td><code>number</code></td><td>Current counter</td></tr>
+                  <tr><td><code>setId(id)</code></td><td><code>void</code></td><td>Set counter</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-automation">
+          <div class="api-entry">
+            <h3>Naming Strategies</h3>
+            <div class="strategy-grid">
+              <div class="strategy-card">
+                <div class="strategy-name">sequential</div>
+                <code>"Button-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">kebab-case</div>
+                <code>"user-profile-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">camelCase</div>
+                <code>"myButton-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">custom</div>
+                <code>"e2e__Btn__1"</code>
+              </div>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3><code>generateAutomationId(componentName, options?): string</code></h3>
+            <pre><code><span class="fn">generateAutomationId</span>(<span class="str">'Button'</span>)                                    <span class="cm">// "Button-1"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'UserProfile'</span>, { strategy: <span class="str">'kebab-case'</span> })   <span class="cm">// "user-profile-2"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'myButton'</span>, { strategy: <span class="str">'camelCase'</span> })       <span class="cm">// "myButton-3"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'Btn'</span>, { prefix: <span class="str">'qa-'</span>, separator: <span class="str">'_'</span> })   <span class="cm">// "qa-Btn_4"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useAutomationId(componentName, options?): string</code></h3>
+            <p>Hook version. Stable across re-renders.</p>
+            <pre><code><span class="kw">function</span> <span class="fn">SubmitButton</span>() {
+  <span class="kw">const</span> testId = <span class="fn">useAutomationId</span>(<span class="str">'SubmitButton'</span>, { strategy: <span class="str">'kebab-case'</span> });
+  <span class="kw">return</span> &lt;<span class="tag">button</span> <span class="attr">data-testid</span>={testId}&gt;Submit&lt;/<span class="tag">button</span>&gt;;
+  <span class="cm">// &lt;button data-testid="submit-button-1"&gt;</span>
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>AutomationIdPool</code></h3>
+            <p>Pre-allocate IDs for large apps. Acquire, release, reuse.</p>
+            <pre><code><span class="kw">const</span> pool = <span class="kw">new</span> <span class="fn">AutomationIdPool</span>(<span class="num">100</span>, <span class="str">'component'</span>, {
+  strategy: <span class="str">'kebab-case'</span>,
+  prefix: <span class="str">'test-'</span>,
+});
+
+pool.<span class="fn">acquire</span>();   <span class="cm">// "test-component-1"</span>
+pool.<span class="fn">acquire</span>();   <span class="cm">// "test-component-2"</span>
+pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-legacy">
+          <div class="api-notice">
+            These use global state. Still functional in v2.0 with deprecation warnings.
+          </div>
+          <div class="api-entry">
+            <h3><code>nextId(localPrefix?: string | null): string</code></h3>
+            <pre><code><span class="fn">nextId</span>()           <span class="cm">// "1"</span>
+<span class="fn">nextId</span>()           <span class="cm">// "2"</span>
+<span class="fn">nextId</span>(<span class="str">'input-'</span>)   <span class="cm">// "input-3"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>generateId(prefix?, suffix?): string</code></h3>
+            <pre><code><span class="fn">generateId</span>(<span class="str">'btn-'</span>, <span class="str">'-primary'</span>) <span class="cm">// "btn-1-primary"</span>
+<span class="fn">generateId</span>(<span class="str">'icon-'</span>)            <span class="cm">// "icon-2"</span>
+<span class="fn">generateId</span>()                   <span class="cm">// "3"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>setGlobalPrefix(prefix)</code> <span class="deprecated-badge">Deprecated</span></h3>
+            <p>Use <code>&lt;IdProvider prefix="..."&gt;</code> instead.</p>
+          </div>
+          <div class="api-entry">
+            <h3><code>setGlobalSuffix(suffix)</code> <span class="deprecated-badge">Deprecated</span></h3>
+            <p>Use <code>&lt;IdProvider suffix="..."&gt;</code> instead.</p>
+          </div>
+          <div class="api-entry">
+            <h3>Other</h3>
+            <pre><code><span class="fn">resetId</span>();          <span class="cm">// reset counter to 0</span>
+<span class="fn">getCurrentId</span>();     <span class="cm">// get current counter value</span>
+<span class="fn">setId</span>(<span class="num">10</span>);           <span class="cm">// set counter to specific value</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="examples">
+    <div class="container">
+      <h2 class="section-title">Examples</h2>
+
+      <div class="example-grid">
+        <div class="example-card">
+          <h3>Form Fields</h3>
+          <p>Link <code>&lt;label&gt;</code> to <code>&lt;input&gt;</code> for accessibility.</p>
+          <pre><code><span class="kw">function</span> <span class="fn">TextField</span>({ label, type = <span class="str">'text'</span> }) {
+  <span class="kw">const</span> id = <span class="fn">useUniqueId</span>(<span class="str">'field-'</span>);
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={id}&gt;{label}&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={id} <span class="attr">type</span>={type} /&gt;
+    &lt;/<span class="tag">div</span>&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="example-card">
+          <h3>ARIA</h3>
+          <p>Link titles and descriptions with <code>aria-labelledby</code>.</p>
+          <pre><code><span class="kw">function</span> <span class="fn">Modal</span>({ title, children }) {
+  <span class="kw">const</span> [titleId, descId] = <span class="fn">useUniqueIds</span>(<span class="num">2</span>, <span class="str">'modal-'</span>);
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span> <span class="attr">role</span>=<span class="str">"dialog"</span>
+         <span class="attr">aria-labelledby</span>={titleId}
+         <span class="attr">aria-describedby</span>={descId}&gt;
+      &lt;<span class="tag">h2</span> <span class="attr">id</span>={titleId}&gt;{title}&lt;/<span class="tag">h2</span>&gt;
+      &lt;<span class="tag">p</span> <span class="attr">id</span>={descId}&gt;{children}&lt;/<span class="tag">p</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="example-card">
+          <h3>SSR</h3>
+          <p>Per-request isolation. No leaks between requests.</p>
+          <pre><code>app.<span class="fn">get</span>(<span class="str">'*'</span>, (req, res) =&gt; {
+  <span class="kw">const</span> ids = <span class="fn">createServerIdManager</span>({
+    prefix: <span class="str">'ssr-'</span>
+  });
+
+  <span class="kw">const</span> headerId  = ids.<span class="fn">nextId</span>(); <span class="cm">// "ssr-1"</span>
+  <span class="kw">const</span> contentId = ids.<span class="fn">nextId</span>(); <span class="cm">// "ssr-2"</span>
+
+  <span class="kw">const</span> html = <span class="fn">renderToString</span>(
+    &lt;<span class="tag">Layout</span> <span class="attr">headerId</span>={headerId}
+            <span class="attr">contentId</span>={contentId} /&gt;
+  );
+  res.<span class="fn">send</span>(html);
+});</code></pre>
+        </div>
+        <div class="example-card">
+          <h3>Testing</h3>
+          <p>Deterministic <code>data-testid</code> for Cypress and Playwright.</p>
+          <pre><code><span class="kw">function</span> <span class="fn">LoginPage</span>() {
+  <span class="kw">const</span> formId = <span class="fn">useAutomationId</span>(
+    <span class="str">'LoginForm'</span>,
+    { strategy: <span class="str">'kebab-case'</span> }
+  );
+  <span class="kw">const</span> submitId = <span class="fn">useAutomationId</span>(
+    <span class="str">'SubmitButton'</span>,
+    { strategy: <span class="str">'kebab-case'</span> }
+  );
+  <span class="kw">return</span> (
+    &lt;<span class="tag">form</span> <span class="attr">data-testid</span>={formId}&gt;
+      &lt;<span class="tag">button</span> <span class="attr">data-testid</span>={submitId}&gt;
+        Log in
+      &lt;/<span class="tag">button</span>&gt;
+    &lt;/<span class="tag">form</span>&gt;
+  );
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="migration">
+    <div class="container">
+      <h2 class="section-title">Migration</h2>
+      <p class="section-subtitle">v1.x to v2.0</p>
+
+      <div class="migration-steps">
+        <div class="migration-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Wrap your app in <code>&lt;IdProvider&gt;</code></h3>
+            <pre><code><span class="kw">import</span> { <span class="fn">IdProvider</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="tag">IdProvider</span>&gt;
+      &lt;<span class="tag">YourApp</span> /&gt;
+    &lt;/<span class="tag">IdProvider</span>&gt;
+  );
+}</code></pre>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Replace global prefix/suffix with provider props</h3>
+            <div class="migration-diff">
+              <div class="diff-remove">
+                <pre><code>setGlobalPrefix('app-');
+setGlobalSuffix('-id');</code></pre>
+              </div>
+              <div class="diff-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+              <div class="diff-add">
+                <pre><code>&lt;IdProvider prefix="app-" suffix="-id"&gt;
+  &lt;YourApp /&gt;
+&lt;/IdProvider&gt;</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Done</h3>
+            <p><code>useUniqueId</code> and <code>useUniqueIds</code> automatically detect the provider. No other changes needed.</p>
+            <p class="step-note">Legacy functions still work with deprecation warnings.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="frameworks">
+    <div class="container">
+      <h2 class="section-title">Frameworks</h2>
+      <div class="framework-grid">
+        <div class="framework-card">
+          <h3>Next.js</h3>
+          <p><code>&lt;IdProvider&gt;</code> in root layout. <code>createServerIdManager</code> in API routes.</p>
+        </div>
+        <div class="framework-card">
+          <h3>Vite</h3>
+          <p>Zero config. ESM picked up automatically.</p>
+        </div>
+        <div class="framework-card">
+          <h3>CRA</h3>
+          <p>Import and use. CJS and ESM.</p>
+        </div>
+        <div class="framework-card">
+          <h3>Remix / Gatsby</h3>
+          <p>Full SSR support with provider + server manager.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>react-unique-id-generator</strong>
+          <p>MIT License. Built by <a href="https://github.com/riyajath-ahamed" target="_blank" rel="noopener">riyajath-ahamed</a>.</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://www.npmjs.com/package/react-unique-id-generator" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator/issues" target="_blank" rel="noopener">Issues</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
