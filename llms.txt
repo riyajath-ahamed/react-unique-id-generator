@@ -1,0 +1,62 @@
+# react-unique-id-generator
+
+> Unique IDs for React. Readable. Predictable. SSR-safe.
+
+A lightweight, zero-dependency library for generating unique, sequential IDs in React applications. Built for accessibility (form labeling, ARIA), SSR hydration safety, and automated testing. Works with React 16.8+.
+
+## Why use this instead of React's `useId()`?
+
+- Custom prefixes and suffixes (`"email-1"` instead of `":r0:"`)
+- Provider-scoped counters for SSR isolation (no cross-request leaks)
+- Works in React 16.8+ (not just React 18+)
+- Works outside components (utility functions, server code)
+- Automation test ID generation with naming strategies
+- Predictable, readable format
+
+## Install
+
+npm install react-unique-id-generator
+
+## Quick Start
+
+```tsx
+import { IdProvider, useUniqueId } from 'react-unique-id-generator';
+
+function App() {
+  return (
+    <IdProvider prefix="app-">
+      <Form />
+    </IdProvider>
+  );
+}
+
+function Form() {
+  const emailId = useUniqueId('email-');    // "email-1"
+  const passwordId = useUniqueId('password-'); // "password-2"
+  return (
+    <form>
+      <label htmlFor={emailId}>Email</label>
+      <input id={emailId} type="email" />
+      <label htmlFor={passwordId}>Password</label>
+      <input id={passwordId} type="password" />
+    </form>
+  );
+}
+```
+
+## Core API
+
+- `<IdProvider prefix? suffix? startId?>` - Context provider that scopes ID counters to its subtree
+- `useUniqueId(localPrefix?)` - Hook that returns a stable unique ID (scoped to nearest IdProvider)
+- `useUniqueIds(count, localPrefix?)` - Hook that returns multiple stable unique IDs
+- `useIdContext()` - Access the current provider's context
+- `createServerIdManager(options?)` - Create an isolated ID manager for SSR (per-request)
+- `generateAutomationId(componentName, options?)` - Generate deterministic test IDs
+- `useAutomationId(componentName, options?)` - Hook version of generateAutomationId
+- `AutomationIdPool` - Pre-allocated pool of automation IDs
+- `nextId(prefix?)` - Legacy: generate next ID using global state
+
+## Documentation
+
+- Full API reference: https://github.com/riyajath-ahamed/react-unique-id-generator#readme
+- Detailed docs with all parameters: llms-full.txt

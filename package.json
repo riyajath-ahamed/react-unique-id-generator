@@ -30,12 +30,24 @@
     "url": "git+https://github.com/riyajath-ahamed/react-unique-id-generator.git"
   },
   "keywords": [
-    "id",
-    "react",
     "react-id",
     "unique-id",
     "id-generator",
-    "typescript"
+    "react-hooks",
+    "useId",
+    "useId-alternative",
+    "ssr-safe-id",
+    "react-ssr-id",
+    "react-unique-id",
+    "react-form-id",
+    "accessibility-id",
+    "aria-id",
+    "data-testid",
+    "data-testid-generator",
+    "test-automation-id",
+    "typescript",
+    "react-context",
+    "sequential-id"
   ],
   "author": "riyajath-ahamed <riyajath.ahamed@gmail.com> (https://github.com/riyajath-ahamed)",
   "license": "MIT",
