@@ -2,7 +2,7 @@
 
 > Unique IDs for React. Readable. Predictable. SSR-safe.
 
-Version: 2.0.0
+Version: 2.1.0
 License: MIT
 Peer dependency: react >=16.8.0
 Zero runtime dependencies.
@@ -25,6 +25,22 @@ import {
   useAutomationId,
   AutomationIdPool,
   resetAutomationCounter,
+
+  // v2.1 additions
+  generateSecureId,
+  nextIdForScope,
+  resetIdForScope,
+  resetAllScopes,
+  getScopeCounter,
+  getActiveScopes,
+  useTrackedUniqueId,
+  useTrackedUniqueIds,
+  useIdMetrics,
+  getIdMetrics,
+  resetIdMetrics,
+  getActiveIdCount,
+  cleanupInactiveIds,
+  OVERFLOW_THRESHOLD,
 } from 'react-unique-id-generator';
 
 // Legacy (deprecated, still functional):
@@ -48,6 +64,7 @@ import type {
   ServerIdManagerOptions,
   AutomationIdStrategy,   // 'sequential' | 'kebab-case' | 'camelCase' | 'custom'
   AutomationIdOptions,
+  IdMetrics,              // { totalGenerated, activeCount, peakActiveCount }
 } from 'react-unique-id-generator';
 ```
 
@@ -244,6 +261,158 @@ beforeEach(() => {
 
 ---
 
+## Secure ID Generation
+
+### `generateSecureId(length?: number): string`
+
+Generates a cryptographically random ID string. Uses the best available source:
+1. `crypto.randomUUID()` — returns a UUID v4 string (ignores `length` param)
+2. `crypto.getRandomValues()` — returns a hex string of the specified length
+3. `Math.random()` fallback — returns a hex string (not cryptographically secure)
+
+Parameters:
+- `length?: number` (default: `32`) - Length of hex string (only used when `randomUUID` is unavailable)
+
+```ts
+generateSecureId()      // "a1b2c3d4-e5f6-7890-abcd-ef1234567890" (UUID)
+generateSecureId(16)    // "a1b2c3d4e5f67890" (16-char hex, when randomUUID unavailable)
+generateSecureId(8)     // "f3a1b2c4" (8-char hex)
+```
+
+Use cases: CSRF tokens, session identifiers, nonces, unique keys where sequential IDs are inappropriate.
+
+---
+
+## Scoped ID Management
+
+Independent counters per named scope. Reset one module without affecting others.
+
+### `nextIdForScope(scope: string, prefix?: string): string`
+
+Generate the next sequential ID within a named scope.
+
+```ts
+nextIdForScope('form', 'field-')   // "field-1"
+nextIdForScope('modal', 'modal-')  // "modal-1"
+nextIdForScope('form', 'field-')   // "field-2" (form scope continues)
+```
+
+### `resetIdForScope(scope: string): void`
+
+Reset the counter for a specific scope to 0. Does not affect other scopes.
+
+```ts
+nextIdForScope('form')    // "1"
+nextIdForScope('form')    // "2"
+resetIdForScope('form')
+nextIdForScope('form')    // "1" (reset)
+```
+
+### `resetAllScopes(): void`
+
+Reset all scope counters at once.
+
+### `getScopeCounter(scope: string): number`
+
+Get the current counter value for a scope. Returns `0` for unused scopes.
+
+### `getActiveScopes(): string[]`
+
+Returns an array of all scope names that have been used and not reset.
+
+```ts
+nextIdForScope('form')
+nextIdForScope('modal')
+getActiveScopes()  // ["form", "modal"]
+
+resetIdForScope('form')
+getActiveScopes()  // ["modal"]
+```
+
+---
+
+## Performance Monitoring & Tracked IDs
+
+### `useTrackedUniqueId(localPrefix?: string): string`
+
+Like `useUniqueId`, but registers the ID in an internal tracking registry and automatically removes it when the component unmounts. Ideal for dynamic lists where components frequently mount and unmount.
+
+```tsx
+function ListItem({ text }) {
+  const id = useTrackedUniqueId('item-');  // tracked, auto-cleaned on unmount
+  return <li id={id}>{text}</li>;
+}
+```
+
+### `useTrackedUniqueIds(count: number, localPrefix?: string): string[]`
+
+Like `useUniqueIds`, but all generated IDs are tracked and cleaned up on unmount.
+
+```tsx
+const [titleId, descId] = useTrackedUniqueIds(2, 'dialog-');
+// Both removed from registry when component unmounts
+```
+
+### `useIdMetrics(): IdMetrics`
+
+React hook that subscribes to real-time ID metrics. Re-renders the component when metrics change. Uses `useSyncExternalStore` internally.
+
+Returns:
+- `totalGenerated: number` - Total tracked IDs ever created (resets with `resetIdMetrics()`)
+- `activeCount: number` - Currently mounted tracked IDs
+- `peakActiveCount: number` - Highest simultaneous active ID count
+
+```tsx
+function DebugPanel() {
+  const metrics = useIdMetrics();
+  return (
+    <pre>
+      Active: {metrics.activeCount}
+      Peak:   {metrics.peakActiveCount}
+      Total:  {metrics.totalGenerated}
+    </pre>
+  );
+}
+```
+
+### `getIdMetrics(): IdMetrics`
+
+Non-hook version. Returns the current snapshot of metrics.
+
+### `getActiveIdCount(): number`
+
+Returns the number of currently tracked (mounted) IDs.
+
+### `resetIdMetrics(): void`
+
+Resets `totalGenerated` to 0. Does not affect active tracking.
+
+### `cleanupInactiveIds(): void`
+
+Clears the entire tracking registry. Useful in test teardown.
+
+---
+
+## Overflow Protection
+
+All counters (global `nextId`, `IdProvider`, `createServerIdManager`) emit a one-time `console.warn` in development when they exceed `OVERFLOW_THRESHOLD` (1,000,000 IDs). The warning resets when the counter is reset.
+
+```ts
+import { OVERFLOW_THRESHOLD } from 'react-unique-id-generator';
+// OVERFLOW_THRESHOLD === 1_000_000
+
+// In dev mode, when any counter crosses 1M:
+// ⚠️ [react-unique-id-generator] ID counter has exceeded 1000000.
+//    This may indicate a memory leak or unintended usage pattern.
+```
+
+This helps catch:
+- Components that generate IDs on every render instead of memoizing
+- Missing cleanup in rapidly mounting/unmounting component trees
+- Runaway loops that generate IDs unintentionally
+
+---
+
 ## Legacy Functions (Deprecated)
 
 These use global state. They emit a one-time deprecation warning in development.
@@ -345,6 +514,65 @@ function LoginButton() {
 
 // In Playwright:
 // await page.getByTestId('login-button-1').click();
+```
+
+### Secure tokens for forms
+
+```tsx
+import { generateSecureId } from 'react-unique-id-generator';
+
+function CSRFToken() {
+  const token = generateSecureId();
+  return <input type="hidden" name="_csrf" value={token} />;
+}
+```
+
+### Scoped ID management across modules
+
+```ts
+import { nextIdForScope, resetIdForScope } from 'react-unique-id-generator';
+
+// Checkout module
+nextIdForScope('checkout', 'cart-');  // "cart-1"
+nextIdForScope('checkout', 'cart-');  // "cart-2"
+
+// Profile module (independent counter)
+nextIdForScope('profile', 'usr-');   // "usr-1"
+
+// Reset checkout only
+resetIdForScope('checkout');
+nextIdForScope('checkout', 'cart-');  // "cart-1" (reset)
+nextIdForScope('profile', 'usr-');   // "usr-2" (unaffected)
+```
+
+### Memory-efficient dynamic lists
+
+```tsx
+import { useTrackedUniqueId, getActiveIdCount } from 'react-unique-id-generator';
+
+function TodoItem({ text }) {
+  const id = useTrackedUniqueId('todo-');
+  return <li id={id}>{text}</li>;
+  // ID auto-removed from registry when this component unmounts
+}
+
+// Monitor active IDs in dev
+console.log(getActiveIdCount()); // matches number of mounted TodoItems
+```
+
+### Dev-only performance dashboard
+
+```tsx
+import { useIdMetrics } from 'react-unique-id-generator';
+
+function IdDebugger() {
+  const { activeCount, peakActiveCount, totalGenerated } = useIdMetrics();
+  return (
+    <div className="debug-bar">
+      Active: {activeCount} | Peak: {peakActiveCount} | Total: {totalGenerated}
+    </div>
+  );
+}
 ```
 
 ---

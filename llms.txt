@@ -2,7 +2,7 @@
 
 > Unique IDs for React. Readable. Predictable. SSR-safe.
 
-A lightweight, zero-dependency library for generating unique, sequential IDs in React applications. Built for accessibility (form labeling, ARIA), SSR hydration safety, and automated testing. Works with React 16.8+.
+A lightweight, zero-dependency library for generating unique, sequential IDs in React applications. Built for accessibility (form labeling, ARIA), SSR hydration safety, automated testing, and performance monitoring. Works with React 16.8+.
 
 ## Why use this instead of React's `useId()`?
 
@@ -11,6 +11,11 @@ A lightweight, zero-dependency library for generating unique, sequential IDs in 
 - Works in React 16.8+ (not just React 18+)
 - Works outside components (utility functions, server code)
 - Automation test ID generation with naming strategies
+- Cryptographically secure random IDs via `generateSecureId()`
+- Scoped ID resets per feature/module
+- Memory-efficient tracked IDs with auto-cleanup on unmount
+- Performance monitoring with `useIdMetrics()`
+- Overflow protection (warns at 1M IDs)
 - Predictable, readable format
 
 ## Install
@@ -55,6 +60,23 @@ function Form() {
 - `useAutomationId(componentName, options?)` - Hook version of generateAutomationId
 - `AutomationIdPool` - Pre-allocated pool of automation IDs
 - `nextId(prefix?)` - Legacy: generate next ID using global state
+
+## v2.1 API
+
+- `generateSecureId(length?)` - Cryptographically random ID (uses crypto.randomUUID/getRandomValues)
+- `nextIdForScope(scope, prefix?)` - Sequential IDs within a named scope
+- `resetIdForScope(scope)` - Reset counter for a specific scope
+- `resetAllScopes()` - Reset all scope counters
+- `getScopeCounter(scope)` - Get current counter for a scope
+- `getActiveScopes()` - List all active scope names
+- `useTrackedUniqueId(localPrefix?)` - Like useUniqueId but auto-cleans from registry on unmount
+- `useTrackedUniqueIds(count, localPrefix?)` - Like useUniqueIds but auto-cleans on unmount
+- `useIdMetrics()` - Hook returning real-time { totalGenerated, activeCount, peakActiveCount }
+- `getIdMetrics()` - Non-hook version of useIdMetrics
+- `getActiveIdCount()` - Number of currently tracked IDs
+- `resetIdMetrics()` - Reset totalGenerated counter
+- `cleanupInactiveIds()` - Clear the tracking registry
+- `OVERFLOW_THRESHOLD` - Exported constant (1,000,000); dev warning fires when any counter exceeds this
 
 ## Documentation
 

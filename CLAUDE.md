@@ -22,10 +22,17 @@ npm run clean         # Remove dist/
 
 ### Source Code
 
-All source lives in `lib/` — just two files:
+All source lives in `lib/`:
 
-- `lib/nextId.ts` — Core module. Contains a module-scoped counter (`lastId`) and all exported functions: `nextId`, `resetId`, `setGlobalPrefix`, `setGlobalSuffix`, `getCurrentId`, `setId`, `generateId`.
-- `lib/index.ts` — Re-exports everything from `nextId.ts`. This is the build entry point.
+- `lib/nextId.ts` — Core module. Module-scoped counter (`lastId`), overflow protection, and exported functions: `nextId`, `resetId`, `setGlobalPrefix`, `setGlobalSuffix`, `getCurrentId`, `setId`, `generateId`, `OVERFLOW_THRESHOLD`.
+- `lib/hooks.ts` — React hooks `useUniqueId` and `useUniqueIds` with provider-aware fallback.
+- `lib/context.tsx` — `IdProvider` context for scoped ID counters with overflow protection.
+- `lib/server.ts` — `createServerIdManager` for SSR-safe per-request ID isolation.
+- `lib/automation.ts` — `generateAutomationId`, `useAutomationId`, `AutomationIdPool` for test automation IDs with naming strategies.
+- `lib/secure.ts` — `generateSecureId()` for cryptographically random IDs using `crypto.randomUUID`/`getRandomValues` with fallback.
+- `lib/scope.ts` — Scoped ID management: `nextIdForScope`, `resetIdForScope`, `resetAllScopes`, `getScopeCounter`, `getActiveScopes`.
+- `lib/performance.ts` — Memory-efficient tracked hooks (`useTrackedUniqueId`, `useTrackedUniqueIds`), performance monitoring (`useIdMetrics`, `getIdMetrics`, `getActiveIdCount`).
+- `lib/index.ts` — Re-exports everything. This is the build entry point.
 
 ### Build Output
 
@@ -41,8 +48,18 @@ Built with **tsup** (esbuild). Config in `tsup.config.ts`. Produces:
 
 Tests live in `tests/`. Framework: **Jest** with **ts-jest** and **jsdom** environment.
 
-- `tests/nextId.test.ts` — Unit tests for all exported functions
+- `tests/nextId.test.ts` — Unit tests for core functions
+- `tests/hooks.test.tsx` — Hook tests (useUniqueId, useUniqueIds)
+- `tests/context.test.tsx` — IdProvider isolation and scoping tests
+- `tests/server.test.ts` — Server ID manager tests
+- `tests/automation.test.tsx` — Automation ID and pool tests
+- `tests/validation.test.ts` — Input validation warning tests
 - `tests/react-integration.test.tsx` — React component integration tests
+- `tests/overflow.test.ts` — Overflow protection edge cases
+- `tests/secure.test.ts` — Secure ID generation and crypto fallbacks
+- `tests/scope.test.ts` — Scoped ID management tests
+- `tests/performance.test.tsx` — Tracked hooks, cleanup, and metrics tests
+- `tests/edge-cases.test.tsx` — Rapid mount/unmount, large ID counts, boundary values
 - `tests/setup.ts` — Jest setup (imports `@testing-library/jest-dom`)
 - `tests/types.d.ts` — Test type declarations
 
@@ -63,6 +80,11 @@ GitHub Actions workflows in `.github/workflows/`:
 - **Negative values clamped to 0, decimals floored** in `setId()`.
 - **`generateId` bypasses global prefix/suffix** — it uses only its own arguments.
 - **`nextId` with a local prefix overrides global prefix** but still appends global suffix.
+- **Overflow protection** warns in dev mode when any counter exceeds 1M IDs. Fires once per counter, resets with `resetId()`.
+- **`generateSecureId`** prefers `crypto.randomUUID`, falls back to `crypto.getRandomValues`, then `Math.random`.
+- **Scoped counters** are stored in a module-level `Map<string, number>`. Each scope is fully independent.
+- **Tracked IDs** use a module-level `Set<string>` registry. `useTrackedUniqueId` adds on mount, removes on unmount via `useEffect` cleanup.
+- **`useIdMetrics`** uses `useSyncExternalStore` with a cached snapshot object to avoid infinite render loops.
 
 ## Code Style
 
