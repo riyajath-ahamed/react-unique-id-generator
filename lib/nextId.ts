@@ -5,6 +5,20 @@ let lastId = 0;
 const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
 const deprecationWarned = new Set<string>();
 
+const OVERFLOW_THRESHOLD = 1_000_000;
+let overflowWarned = false;
+
+function checkOverflow(counter: number): void {
+  if (isDev && counter >= OVERFLOW_THRESHOLD && !overflowWarned) {
+    overflowWarned = true;
+    console.warn(
+      `[react-unique-id-generator] ID counter has exceeded ${OVERFLOW_THRESHOLD}. ` +
+      `This may indicate a memory leak or unintended usage pattern. ` +
+      `Consider using resetId() or scoped ID management.`
+    );
+  }
+}
+
 function warnDeprecated(name: string, alternative: string): void {
   if (isDev && !deprecationWarned.has(name)) {
     deprecationWarned.add(name);
@@ -39,6 +53,7 @@ export default function nextId(localPrefix?: string | null): string {
     );
   }
   lastId++;
+  checkOverflow(lastId);
   return `${localPrefix !== null && localPrefix !== undefined ? localPrefix : globalPrefix}${lastId}${globalSuffix}`;
 }
 
@@ -56,6 +71,7 @@ export default function nextId(localPrefix?: string | null): string {
  */
 export const resetId = (): void => {
   lastId = 0;
+  overflowWarned = false;
 };
 
 /**
@@ -156,5 +172,8 @@ export const setId = (id: number): void => {
  */
 export const generateId = (prefix: string = "", suffix: string = ""): string => {
   lastId++;
+  checkOverflow(lastId);
   return `${prefix}${lastId}${suffix}`;
 };
+
+export { OVERFLOW_THRESHOLD };
