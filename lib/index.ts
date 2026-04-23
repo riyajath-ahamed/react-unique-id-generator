@@ -4,7 +4,8 @@ import nextId, {
   setGlobalSuffix,
   getCurrentId,
   setId,
-  generateId
+  generateId,
+  OVERFLOW_THRESHOLD
 } from "./nextId";
 
 import { useUniqueId, useUniqueIds } from "./hooks";
@@ -23,6 +24,27 @@ import {
 } from "./automation";
 import type { AutomationIdStrategy, AutomationIdOptions } from "./automation";
 
+import { generateSecureId } from "./secure";
+
+import {
+  nextIdForScope,
+  resetIdForScope,
+  resetAllScopes,
+  getScopeCounter,
+  getActiveScopes,
+} from "./scope";
+
+import {
+  useTrackedUniqueId,
+  useTrackedUniqueIds,
+  useIdMetrics,
+  getIdMetrics,
+  resetIdMetrics,
+  getActiveIdCount,
+  cleanupInactiveIds,
+} from "./performance";
+import type { IdMetrics } from "./performance";
+
 export {
   nextId as default,
   resetId,
@@ -31,6 +53,7 @@ export {
   getCurrentId,
   setId,
   generateId,
+  OVERFLOW_THRESHOLD,
   useUniqueId,
   useUniqueIds,
 
@@ -44,6 +67,22 @@ export {
   useAutomationId,
   resetAutomationCounter,
   AutomationIdPool,
+
+  generateSecureId,
+
+  nextIdForScope,
+  resetIdForScope,
+  resetAllScopes,
+  getScopeCounter,
+  getActiveScopes,
+
+  useTrackedUniqueId,
+  useTrackedUniqueIds,
+  useIdMetrics,
+  getIdMetrics,
+  resetIdMetrics,
+  getActiveIdCount,
+  cleanupInactiveIds,
 };
 
 export type {
@@ -53,4 +92,5 @@ export type {
   ServerIdManagerOptions,
   AutomationIdStrategy,
   AutomationIdOptions,
+  IdMetrics,
 };
