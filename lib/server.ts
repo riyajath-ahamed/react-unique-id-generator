@@ -1,3 +1,6 @@
+const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
+const OVERFLOW_THRESHOLD = 1_000_000;
+
 export interface ServerIdManagerOptions {
   prefix?: string;
   suffix?: string;
@@ -16,10 +19,18 @@ export function createServerIdManager(
 ): ServerIdManager {
   const { prefix = '', suffix = '', startId = 0 } = options;
   let lastId = startId;
+  let overflowWarned = false;
 
   return {
     nextId(localPrefix?: string | null): string {
       lastId++;
+      if (isDev && lastId >= OVERFLOW_THRESHOLD && !overflowWarned) {
+        overflowWarned = true;
+        console.warn(
+          `[react-unique-id-generator] Server ID manager counter has exceeded ${OVERFLOW_THRESHOLD}. ` +
+          `This may indicate a memory leak or unintended usage pattern.`
+        );
+      }
       const p = localPrefix !== null && localPrefix !== undefined
         ? localPrefix
         : prefix;
@@ -28,6 +39,7 @@ export function createServerIdManager(
 
     resetId(): void {
       lastId = 0;
+      overflowWarned = false;
     },
 
     getCurrentId(): number {

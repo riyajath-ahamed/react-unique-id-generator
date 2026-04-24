@@ -22,6 +22,7 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links" id="nav-links">
+        <li><a href="#whats-new">What's New</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#quick-start">Quick Start</a></li>
         <li><a href="#api">API</a></li>
@@ -39,10 +40,10 @@
 
   <section class="hero">
     <div class="container">
-      <div class="hero-badge">v2.0</div>
+      <div class="hero-badge">v2.1</div>
       <h1 class="hero-title">react-unique-id-generator</h1>
       <p class="hero-subtitle">Readable. Predictable. SSR-safe.</p>
-      <p class="hero-desc">Zero-dependency unique ID generation for React. Custom prefixes, provider-scoped counters, SSR isolation, and automation test IDs.</p>
+      <p class="hero-desc">Zero-dependency unique ID generation for React. Custom prefixes, provider-scoped counters, SSR isolation, secure IDs, performance monitoring, and automation test IDs.</p>
       <div class="hero-actions">
         <a href="#quick-start" class="btn btn-primary">Get Started</a>
         <div class="hero-install">
@@ -68,6 +69,43 @@
         <div class="stat">
           <span class="stat-value">SSR</span>
           <span class="stat-label">Safe</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="whats-new">
+    <div class="container">
+      <h2 class="section-title">What's New in v2.1</h2>
+      <p class="section-subtitle">Performance, security, and scoped control. Fully backward compatible.</p>
+      <div class="whats-new-grid">
+        <div class="whats-new-card">
+          <div class="whats-new-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Secure ID Generation</h3>
+          <p><code>generateSecureId()</code> uses <code>crypto.randomUUID</code> with automatic fallbacks for cryptographically random IDs.</p>
+        </div>
+        <div class="whats-new-card">
+          <div class="whats-new-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Performance Monitoring</h3>
+          <p><code>useIdMetrics()</code> tracks active IDs, peak counts, and total generated. <code>useTrackedUniqueId()</code> auto-cleans on unmount.</p>
+        </div>
+        <div class="whats-new-card">
+          <div class="whats-new-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <h3>Scoped Resets</h3>
+          <p><code>resetIdForScope()</code> and <code>nextIdForScope()</code> let you manage independent counters per feature or module.</p>
+        </div>
+        <div class="whats-new-card">
+          <div class="whats-new-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3>Overflow Protection</h3>
+          <p>Automatic dev-mode warning when any counter exceeds 1M IDs, catching memory leaks before they hit production.</p>
         </div>
       </div>
     </div>
@@ -142,6 +180,27 @@
           <h3>Well-Tested</h3>
           <p>100% coverage. Provider isolation, SSR, hooks, edge cases.</p>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3>Secure IDs</h3>
+          <p>Cryptographically random IDs via <code>generateSecureId()</code> with automatic fallbacks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3>Performance</h3>
+          <p>Tracked IDs with auto-cleanup on unmount. Real-time metrics via <code>useIdMetrics()</code>.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <h3>Scoped Resets</h3>
+          <p>Independent counters per scope. Reset one module without touching others.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -169,6 +228,10 @@
             <tr><td>React 16+ support</td><td class="yes">Yes</td><td class="no">18+ only</td></tr>
             <tr><td>Non-component usage</td><td class="yes">Yes</td><td class="no">Hooks only</td></tr>
             <tr><td>Predictable format</td><td class="yes">prefix-1</td><td class="no">:r0:</td></tr>
+            <tr><td>Secure random IDs</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Scoped resets</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Overflow protection</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Performance monitoring</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>Zero runtime deps</td><td class="yes">Yes</td><td class="yes">Built-in</td></tr>
           </tbody>
         </table>
@@ -238,6 +301,8 @@
           <button class="tab-btn" data-tab="api-hooks">Hooks</button>
           <button class="tab-btn" data-tab="api-ssr">SSR</button>
           <button class="tab-btn" data-tab="api-automation">Automation</button>
+          <button class="tab-btn" data-tab="api-secure">Secure & Scope</button>
+          <button class="tab-btn" data-tab="api-performance">Performance</button>
           <button class="tab-btn" data-tab="api-legacy">Legacy</button>
         </div>
 
@@ -382,6 +447,108 @@ pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</sp
           </div>
         </div>
 
+        <div class="tab-panel" data-panel="api-secure">
+          <div class="api-entry">
+            <h3><code>generateSecureId(length?: number): string</code></h3>
+            <p>Generates a cryptographically random ID. Uses <code>crypto.randomUUID</code> when available, falls back to <code>crypto.getRandomValues</code>, then <code>Math.random</code>.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>length</code></td><td><code>number</code></td><td><code>32</code></td><td>Hex string length (used when <code>randomUUID</code> is unavailable)</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">generateSecureId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">generateSecureId</span>();    <span class="cm">// "a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>
+<span class="fn">generateSecureId</span>(<span class="num">16</span>); <span class="cm">// "a1b2c3d4e5f67890" (hex fallback)</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>nextIdForScope(scope, prefix?): string</code></h3>
+            <p>Generate sequential IDs within a named scope. Each scope has an independent counter.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">nextIdForScope</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>, <span class="str">'field-'</span>);   <span class="cm">// "field-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'modal'</span>, <span class="str">'modal-'</span>); <span class="cm">// "modal-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>, <span class="str">'field-'</span>);   <span class="cm">// "field-2"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>resetIdForScope(scope): void</code></h3>
+            <p>Reset the counter for a specific scope without affecting others.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">resetIdForScope</span>, <span class="fn">nextIdForScope</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>);  <span class="cm">// "1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>);  <span class="cm">// "2"</span>
+<span class="fn">resetIdForScope</span>(<span class="str">'form'</span>);
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>);  <span class="cm">// "1" (reset!)</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Other Scope Utilities</h3>
+            <pre><code><span class="fn">resetAllScopes</span>();          <span class="cm">// reset every scope counter</span>
+<span class="fn">getScopeCounter</span>(<span class="str">'form'</span>);   <span class="cm">// 2 (current counter value)</span>
+<span class="fn">getActiveScopes</span>();         <span class="cm">// ["form", "modal"] (active scope names)</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-performance">
+          <div class="api-entry">
+            <h3><code>useTrackedUniqueId(localPrefix?): string</code></h3>
+            <p>Like <code>useUniqueId</code>, but tracks the ID and automatically removes it from the registry on unmount. Ideal for dynamic lists and frequently mounted/unmounted components.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">useTrackedUniqueId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">ListItem</span>({ label }) {
+  <span class="kw">const</span> id = <span class="fn">useTrackedUniqueId</span>(<span class="str">'item-'</span>);  <span class="cm">// tracked + auto-cleaned</span>
+  <span class="kw">return</span> &lt;<span class="tag">li</span> <span class="attr">id</span>={id}&gt;{label}&lt;/<span class="tag">li</span>&gt;;
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useTrackedUniqueIds(count, localPrefix?): string[]</code></h3>
+            <p>Tracked version of <code>useUniqueIds</code>. All IDs are cleaned up on unmount.</p>
+            <pre><code><span class="kw">const</span> [titleId, descId] = <span class="fn">useTrackedUniqueIds</span>(<span class="num">2</span>, <span class="str">'dialog-'</span>);
+<span class="cm">// Both tracked; both cleaned up when component unmounts</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdMetrics(): IdMetrics</code></h3>
+            <p>React hook that subscribes to real-time ID metrics. Re-renders when metrics change.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>totalGenerated</code></td><td><code>number</code></td><td>Total tracked IDs ever created</td></tr>
+                  <tr><td><code>activeCount</code></td><td><code>number</code></td><td>Currently mounted tracked IDs</td></tr>
+                  <tr><td><code>peakActiveCount</code></td><td><code>number</code></td><td>Highest simultaneous active count</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">function</span> <span class="fn">DebugPanel</span>() {
+  <span class="kw">const</span> metrics = <span class="fn">useIdMetrics</span>();
+  <span class="kw">return</span> (
+    &lt;<span class="tag">pre</span>&gt;
+      Active: {metrics.activeCount}
+      Peak:   {metrics.peakActiveCount}
+      Total:  {metrics.totalGenerated}
+    &lt;/<span class="tag">pre</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Utility Functions</h3>
+            <pre><code><span class="fn">getIdMetrics</span>();         <span class="cm">// { totalGenerated, activeCount, peakActiveCount }</span>
+<span class="fn">getActiveIdCount</span>();     <span class="cm">// number of currently tracked IDs</span>
+<span class="fn">resetIdMetrics</span>();       <span class="cm">// reset totalGenerated counter</span>
+<span class="fn">cleanupInactiveIds</span>();  <span class="cm">// clear the entire tracking registry</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Overflow Protection</h3>
+            <p>All counters (global, provider, server) emit a dev-mode console warning when they exceed <code>OVERFLOW_THRESHOLD</code> (1,000,000). The warning fires once per counter and resets with the counter.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">OVERFLOW_THRESHOLD</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+console.<span class="fn">log</span>(<span class="fn">OVERFLOW_THRESHOLD</span>);  <span class="cm">// 1_000_000</span>
+<span class="cm">// Warning auto-fires in dev when any counter crosses this</span></code></pre>
+          </div>
+        </div>
+
         <div class="tab-panel" data-panel="api-legacy">
           <div class="api-notice">
             These use global state. Still functional in v2.0 with deprecation warnings.
@@ -486,6 +653,73 @@ pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</sp
         Log in
       &lt;/<span class="tag">button</span>&gt;
     &lt;/<span class="tag">form</span>&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="example-card">
+          <h3>Secure Tokens</h3>
+          <p>Cryptographic IDs for CSRF tokens, session keys, or nonces.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">generateSecureId</span> } <span class="kw">from</span>
+  <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">CSRFToken</span>() {
+  <span class="kw">const</span> token = <span class="fn">generateSecureId</span>();
+  <span class="kw">return</span> (
+    &lt;<span class="tag">input</span>
+      <span class="attr">type</span>=<span class="str">"hidden"</span>
+      <span class="attr">name</span>=<span class="str">"_csrf"</span>
+      <span class="attr">value</span>={token}
+    /&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="example-card">
+          <h3>Scoped Modules</h3>
+          <p>Independent counters per feature. Reset one without touching others.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">nextIdForScope</span>, <span class="fn">resetIdForScope</span> }
+  <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="cm">// Each module gets its own counter</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'checkout'</span>, <span class="str">'cart-'</span>); <span class="cm">// "cart-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'profile'</span>, <span class="str">'usr-'</span>);  <span class="cm">// "usr-1"</span>
+
+<span class="cm">// Reset checkout without affecting profile</span>
+<span class="fn">resetIdForScope</span>(<span class="str">'checkout'</span>);
+<span class="fn">nextIdForScope</span>(<span class="str">'checkout'</span>, <span class="str">'cart-'</span>); <span class="cm">// "cart-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'profile'</span>, <span class="str">'usr-'</span>);  <span class="cm">// "usr-2"</span></code></pre>
+        </div>
+        <div class="example-card">
+          <h3>Dynamic Lists</h3>
+          <p>Tracked IDs that auto-clean when components unmount.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">useTrackedUniqueId</span>,
+  <span class="fn">getActiveIdCount</span> } <span class="kw">from</span>
+  <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">TodoItem</span>({ text }) {
+  <span class="kw">const</span> id = <span class="fn">useTrackedUniqueId</span>(<span class="str">'todo-'</span>);
+  <span class="kw">return</span> &lt;<span class="tag">li</span> <span class="attr">id</span>={id}&gt;{text}&lt;/<span class="tag">li</span>&gt;;
+  <span class="cm">// ID removed from registry on unmount</span>
+}
+
+<span class="cm">// Check how many IDs are active</span>
+<span class="fn">getActiveIdCount</span>(); <span class="cm">// matches mounted items</span></code></pre>
+        </div>
+        <div class="example-card">
+          <h3>Dev Dashboard</h3>
+          <p>Real-time metrics to spot ID leaks during development.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">useIdMetrics</span> } <span class="kw">from</span>
+  <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">IdDebugger</span>() {
+  <span class="kw">const</span> { activeCount, peakActiveCount,
+    totalGenerated } = <span class="fn">useIdMetrics</span>();
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span> <span class="attr">className</span>=<span class="str">"debug-bar"</span>&gt;
+      Active: {activeCount} |
+      Peak: {peakActiveCount} |
+      Total: {totalGenerated}
+    &lt;/<span class="tag">div</span>&gt;
   );
 }</code></pre>
         </div>

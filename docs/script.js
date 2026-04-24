@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { threshold: 0.1 }
   );
 
-  document.querySelectorAll('.feature-card, .example-card, .framework-card, .migration-step').forEach((el) => {
+  document.querySelectorAll('.feature-card, .example-card, .framework-card, .migration-step, .whats-new-card').forEach((el) => {
     el.classList.add('fade-in');
     observer.observe(el);
   });

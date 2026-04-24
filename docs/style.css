@@ -360,6 +360,44 @@ code {
   line-height: 1.6;
 }
 
+/* What's New */
+.whats-new-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.whats-new-card {
+  background: var(--white);
+  padding: 24px;
+}
+
+.whats-new-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark);
+  margin-bottom: 10px;
+}
+
+.whats-new-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.whats-new-card p {
+  font-size: 0.85rem;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
 /* Comparison Table */
 .table-wrap {
   overflow-x: auto;
@@ -816,6 +854,10 @@ pre code {
   }
 
   .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .whats-new-grid {
     grid-template-columns: 1fr;
   }
 
