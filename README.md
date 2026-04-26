@@ -1,3 +1,7 @@
+<p align="center">
+ <img src="assets\icon\id-button_1f194.png" width="120" />
+ </p>
+ 
 <h1 align="center">react-unique-id-generator</h1>
 
 <p align="center">
