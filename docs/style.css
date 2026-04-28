@@ -915,6 +915,37 @@ pre code {
   }
 }
 
+/* Page Header (for inner pages) */
+.page-header {
+  padding: 96px 0 48px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header .hero-badge {
+  margin-bottom: 16px;
+}
+
+.page-header h1 {
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.page-header p {
+  font-size: 0.95rem;
+  color: var(--gray);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Active nav link */
+.nav-links a.active {
+  color: var(--dark);
+  font-weight: 500;
+}
+
 /* Animations */
 .fade-in {
   opacity: 0;

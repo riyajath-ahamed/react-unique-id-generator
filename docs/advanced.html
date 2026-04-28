@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Features - react-unique-id-generator</title>
+  <meta name="description" content="v2.2 advanced features: custom ID strategies, collision detection, ID pool management, SSR provider, and custom delimiters." />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo"><img src="favicon.ico" width="11" /> react-unique-id-generator</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html" data-page="index.html">Home</a></li>
+        <li><a href="api.html" data-page="api.html">API</a></li>
+        <li><a href="advanced.html" data-page="advanced.html">Advanced</a></li>
+        <li><a href="examples.html" data-page="examples.html">Examples</a></li>
+        <li>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" class="nav-github" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-header">
+    <div class="container">
+      <div class="hero-badge">v2.2</div>
+      <h1>Advanced Features</h1>
+      <p>Custom ID strategies, collision detection, ID pool management, SSR utilities, and custom delimiters.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="tabs" id="advanced-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="adv-strategies">Strategies</button>
+          <button class="tab-btn" data-tab="adv-collision">Collision Detection</button>
+          <button class="tab-btn" data-tab="adv-pool">ID Pools</button>
+          <button class="tab-btn" data-tab="adv-ssr">SSR Utilities</button>
+          <button class="tab-btn" data-tab="adv-delimiter">Delimiters</button>
+        </div>
+
+        <!-- Strategies -->
+        <div class="tab-panel active" data-panel="adv-strategies">
+          <div class="api-entry">
+            <h3><code>IdStrategy</code> Interface</h3>
+            <p>Define how IDs are formatted. Swap strategies without changing component code.</p>
+            <pre><code><span class="kw">interface</span> <span class="type">IdStrategy</span> {
+  <span class="fn">generate</span>(prefix: <span class="type">string</span>, suffix: <span class="type">string</span>, counter: <span class="type">number</span>): <span class="type">string</span>;
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Built-in Strategies</h3>
+            <div class="strategy-grid">
+              <div class="strategy-card">
+                <div class="strategy-name">numeric</div>
+                <code>"btn-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">zeroPadded(4)</div>
+                <code>"btn-0001"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">timestamp</div>
+                <code>"ts-17143...-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">hash</div>
+                <code>"h-a3f2b1c0"</code>
+              </div>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3><code>generateIdWithStrategy(strategy, prefix?, suffix?): string</code></h3>
+            <p>Generate an ID using a strategy outside of React components.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">generateIdWithStrategy</span>, <span class="fn">numericStrategy</span>,
+  <span class="fn">zeroPaddedStrategy</span>, <span class="fn">hashStrategy</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">generateIdWithStrategy</span>(<span class="fn">numericStrategy</span>, <span class="str">'item-'</span>)        <span class="cm">// "item-1"</span>
+<span class="fn">generateIdWithStrategy</span>(<span class="fn">zeroPaddedStrategy</span>(<span class="num">4</span>), <span class="str">'id-'</span>)   <span class="cm">// "id-0002"</span>
+<span class="fn">generateIdWithStrategy</span>(<span class="fn">hashStrategy</span>, <span class="str">'h-'</span>)              <span class="cm">// "h-a3f2b1c0"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdWithStrategy(strategy, prefix?, suffix?): string</code></h3>
+            <p>React hook. Generates a stable ID using the given strategy. Persists across re-renders.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">useIdWithStrategy</span>, <span class="fn">zeroPaddedStrategy</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">OrderItem</span>() {
+  <span class="kw">const</span> id = <span class="fn">useIdWithStrategy</span>(<span class="fn">zeroPaddedStrategy</span>(<span class="num">6</span>), <span class="str">'order-'</span>);
+  <span class="kw">return</span> &lt;<span class="tag">div</span> <span class="attr">id</span>={id}&gt;...&lt;/<span class="tag">div</span>&gt;;
+  <span class="cm">// &lt;div id="order-000001"&gt;</span>
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Custom Strategy Example</h3>
+            <pre><code><span class="kw">import</span> <span class="kw">type</span> { <span class="type">IdStrategy</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">const</span> <span class="fn">base36Strategy</span>: <span class="type">IdStrategy</span> = {
+  <span class="fn">generate</span>(prefix, suffix, counter) {
+    <span class="kw">return</span> <span class="str">`${prefix}${counter.toString(36)}${suffix}`</span>;
+  },
+};
+
+<span class="fn">generateIdWithStrategy</span>(<span class="fn">base36Strategy</span>, <span class="str">'x-'</span>);
+<span class="cm">// "x-1", "x-2", ... "x-a", "x-b"</span></code></pre>
+          </div>
+        </div>
+
+        <!-- Collision Detection -->
+        <div class="tab-panel" data-panel="adv-collision">
+          <div class="api-entry">
+            <h3><code>CollisionDetector</code></h3>
+            <p>Track generated IDs and detect duplicates. Useful for debugging, testing, or enforcing uniqueness.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>action</code></td><td><code>'warn' | 'throw' | 'skip'</code></td><td><code>'warn'</code></td><td>Behavior on collision</td></tr>
+                  <tr><td><code>maxSize</code></td><td><code>number</code></td><td><code>100000</code></td><td>Max registry size before warning</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">CollisionDetector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">const</span> detector = <span class="kw">new</span> <span class="fn">CollisionDetector</span>({ action: <span class="str">'throw'</span> });
+
+detector.<span class="fn">register</span>(<span class="str">'input-1'</span>);  <span class="cm">// true</span>
+detector.<span class="fn">register</span>(<span class="str">'input-2'</span>);  <span class="cm">// true</span>
+detector.<span class="fn">register</span>(<span class="str">'input-1'</span>);  <span class="cm">// throws Error!</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Methods</h3>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>register(id)</code></td><td><code>boolean</code></td><td>Register an ID. Returns <code>false</code> on collision</td></tr>
+                  <tr><td><code>has(id)</code></td><td><code>boolean</code></td><td>Check if an ID is registered</td></tr>
+                  <tr><td><code>unregister(id)</code></td><td><code>boolean</code></td><td>Remove an ID from the registry</td></tr>
+                  <tr><td><code>clear()</code></td><td><code>void</code></td><td>Clear all registrations and collision count</td></tr>
+                  <tr><td><code>getRegisteredIds()</code></td><td><code>string[]</code></td><td>Get all registered IDs</td></tr>
+                  <tr><td><code>size</code></td><td><code>number</code></td><td>Number of registered IDs</td></tr>
+                  <tr><td><code>collisions</code></td><td><code>number</code></td><td>Total collisions detected</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3><code>checkCollision(id, action?): boolean</code></h3>
+            <p>Convenience function using a global singleton detector. Returns <code>true</code> if registered, <code>false</code> on collision.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">checkCollision</span>, <span class="fn">resetGlobalCollisionDetector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">checkCollision</span>(<span class="str">'field-1'</span>);          <span class="cm">// true</span>
+<span class="fn">checkCollision</span>(<span class="str">'field-1'</span>, <span class="str">'skip'</span>);  <span class="cm">// false (duplicate)</span>
+<span class="fn">checkCollision</span>(<span class="str">'field-1'</span>, <span class="str">'throw'</span>); <span class="cm">// throws Error</span>
+
+<span class="fn">resetGlobalCollisionDetector</span>();     <span class="cm">// reset between tests</span></code></pre>
+          </div>
+        </div>
+
+        <!-- ID Pools -->
+        <div class="tab-panel" data-panel="adv-pool">
+          <div class="api-entry">
+            <h3><code>IdPool</code></h3>
+            <p>Generic ID pool with acquire/release semantics. Distinct from <code>AutomationIdPool</code> (which is automation-specific).</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td><td>Prefix for generated IDs</td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td><td>Suffix for generated IDs</td></tr>
+                  <tr><td><code>autoRefill</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Auto-generate when exhausted</td></tr>
+                  <tr><td><code>generator</code></td><td><code>(index) =&gt; string</code></td><td>-</td><td>Custom ID generator</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">IdPool</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">const</span> pool = <span class="kw">new</span> <span class="fn">IdPool</span>(<span class="num">100</span>, { prefix: <span class="str">'widget-'</span>, suffix: <span class="str">'-el'</span> });
+
+<span class="kw">const</span> id1 = pool.<span class="fn">acquire</span>();  <span class="cm">// "widget-1-el"</span>
+<span class="kw">const</span> id2 = pool.<span class="fn">acquire</span>();  <span class="cm">// "widget-2-el"</span>
+
+pool.<span class="fn">release</span>(id1);           <span class="cm">// return to pool</span>
+pool.<span class="fn">acquire</span>();              <span class="cm">// "widget-1-el" (reused)</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Methods</h3>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>acquire()</code></td><td><code>string</code></td><td>Next available ID (reuses released first)</td></tr>
+                  <tr><td><code>release(id)</code></td><td><code>void</code></td><td>Return an ID to the pool</td></tr>
+                  <tr><td><code>drain()</code></td><td><code>void</code></td><td>Clear all available and released IDs</td></tr>
+                  <tr><td><code>refill(count)</code></td><td><code>void</code></td><td>Add more pre-generated IDs</td></tr>
+                  <tr><td><code>size</code></td><td><code>number</code></td><td>Available + released IDs</td></tr>
+                  <tr><td><code>totalGenerated</code></td><td><code>number</code></td><td>Total IDs ever generated</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3>Custom Generator</h3>
+            <pre><code><span class="kw">const</span> pool = <span class="kw">new</span> <span class="fn">IdPool</span>(<span class="num">50</span>, {
+  generator: (i) =&gt; <span class="str">`session-${Date.now()}-${i}`</span>,
+});</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdPool(size, prefix?): () => string</code></h3>
+            <p>React hook that pre-generates a pool and returns an <code>acquire</code> function. Stable across re-renders.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">useIdPool</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">DynamicList</span>({ items }) {
+  <span class="kw">const</span> acquireId = <span class="fn">useIdPool</span>(<span class="num">20</span>, <span class="str">'item-'</span>);
+
+  <span class="kw">return</span> items.<span class="fn">map</span>((item) =&gt; (
+    &lt;<span class="tag">li</span> <span class="attr">key</span>={<span class="fn">acquireId</span>()} <span class="attr">id</span>={<span class="fn">acquireId</span>()}&gt;
+      {item.name}
+    &lt;/<span class="tag">li</span>&gt;
+  ));
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- SSR Utilities -->
+        <div class="tab-panel" data-panel="adv-ssr">
+          <div class="api-entry">
+            <h3><code>&lt;SSRProvider&gt;</code></h3>
+            <p>React context provider that scopes IDs per server request. Use <code>requestId</code> to namespace IDs for deterministic, collision-free SSR output.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td><td>Default prefix for IDs</td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td><td>Suffix appended to all IDs</td></tr>
+                  <tr><td><code>requestId</code></td><td><code>string</code></td><td>-</td><td>Request identifier for namespacing</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">SSRProvider</span>, <span class="fn">useSSRSafeId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">App</span>({ requestId }) {
+  <span class="kw">return</span> (
+    &lt;<span class="tag">SSRProvider</span> <span class="attr">requestId</span>={requestId} <span class="attr">prefix</span>=<span class="str">"app-"</span>&gt;
+      &lt;<span class="tag">Form</span> /&gt;
+    &lt;/<span class="tag">SSRProvider</span>&gt;
+  );
+}
+
+<span class="kw">function</span> <span class="fn">Form</span>() {
+  <span class="kw">const</span> emailId = <span class="fn">useSSRSafeId</span>(<span class="str">'email-'</span>);  <span class="cm">// "email-req123-1"</span>
+  <span class="kw">const</span> passId = <span class="fn">useSSRSafeId</span>(<span class="str">'pass-'</span>);    <span class="cm">// "pass-req123-2"</span>
+  <span class="kw">return</span> (
+    &lt;<span class="tag">form</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={emailId}&gt;Email&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={emailId} /&gt;
+    &lt;/<span class="tag">form</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useSSRSafeId(prefix?): string</code></h3>
+            <p>Hook for SSR-safe IDs inside <code>&lt;SSRProvider&gt;</code>. Falls back to timestamp-based ID outside a provider (with a dev warning). Stable across re-renders.</p>
+          </div>
+          <div class="api-entry">
+            <h3><code>useSSRContext(): SSRContextValue | null</code></h3>
+            <p>Access the SSR provider context directly. Returns <code>null</code> outside an <code>&lt;SSRProvider&gt;</code>.</p>
+          </div>
+          <div class="api-entry">
+            <h3><code>createSSRIdFactory(requestId, prefix?, suffix?)</code></h3>
+            <p>Non-React factory for server-side ID generation with request scoping. Each factory is fully independent.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">createSSRIdFactory</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+app.<span class="fn">get</span>(<span class="str">'*'</span>, (req, res) =&gt; {
+  <span class="kw">const</span> ids = <span class="fn">createSSRIdFactory</span>(req.id, <span class="str">'ssr-'</span>);
+
+  <span class="kw">const</span> headerId  = ids.<span class="fn">nextId</span>();  <span class="cm">// "ssr-abc123-1"</span>
+  <span class="kw">const</span> contentId = ids.<span class="fn">nextId</span>();  <span class="cm">// "ssr-abc123-2"</span>
+
+  ids.<span class="fn">resetId</span>();                   <span class="cm">// reset for reuse</span>
+  ids.<span class="fn">getCurrentId</span>();              <span class="cm">// 0</span>
+});</code></pre>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>nextId(localPrefix?)</code></td><td><code>string</code></td><td>Next request-scoped ID</td></tr>
+                  <tr><td><code>resetId()</code></td><td><code>void</code></td><td>Reset counter to 0</td></tr>
+                  <tr><td><code>getCurrentId()</code></td><td><code>number</code></td><td>Current counter value</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delimiters -->
+        <div class="tab-panel" data-panel="adv-delimiter">
+          <div class="api-entry">
+            <h3><code>generateDelimitedId(options?): string</code></h3>
+            <p>Generate an ID with parts joined by a custom delimiter. Empty parts are omitted from the output.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td><td>Prefix part</td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td><td>Suffix part</td></tr>
+                  <tr><td><code>delimiter</code></td><td><code>string</code></td><td><code>"-"</code></td><td>Separator between parts</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">generateDelimitedId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">generateDelimitedId</span>({ prefix: <span class="str">'app'</span>, delimiter: <span class="str">'.'</span> })
+<span class="cm">// "app.1"</span>
+
+<span class="fn">generateDelimitedId</span>({ prefix: <span class="str">'com'</span>, suffix: <span class="str">'widget'</span>, delimiter: <span class="str">'.'</span> })
+<span class="cm">// "com.2.widget"</span>
+
+<span class="fn">generateDelimitedId</span>({ prefix: <span class="str">'ns'</span>, suffix: <span class="str">'item'</span>, delimiter: <span class="str">'::'</span> })
+<span class="cm">// "ns::3::item"</span>
+
+<span class="fn">generateDelimitedId</span>({ prefix: <span class="str">'path'</span>, suffix: <span class="str">'el'</span>, delimiter: <span class="str">'/'</span> })
+<span class="cm">// "path/4/el"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useDelimitedId(prefix?, delimiter?, suffix?): string</code></h3>
+            <p>React hook version. Returns a stable delimited ID across re-renders. Works with <code>&lt;IdProvider&gt;</code> context.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">useDelimitedId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">Widget</span>() {
+  <span class="kw">const</span> id = <span class="fn">useDelimitedId</span>(<span class="str">'widget'</span>, <span class="str">'.'</span>, <span class="str">'container'</span>);
+  <span class="kw">return</span> &lt;<span class="tag">div</span> <span class="attr">id</span>={id}&gt;...&lt;/<span class="tag">div</span>&gt;;
+  <span class="cm">// &lt;div id="widget.1.container"&gt;</span>
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Utilities</h3>
+            <pre><code><span class="fn">resetDelimiterCounter</span>();   <span class="cm">// reset to 0</span>
+<span class="fn">getDelimiterCounter</span>();     <span class="cm">// current counter value</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>react-unique-id-generator</strong>
+          <p>MIT License. Built by <a href="https://github.com/riyajath-ahamed" target="_blank" rel="noopener">riyajath-ahamed</a>.</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://www.npmjs.com/package/react-unique-id-generator" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator/issues" target="_blank" rel="noopener">Issues</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

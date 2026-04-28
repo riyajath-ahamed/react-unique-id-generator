@@ -90,8 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
     { threshold: 0.1 }
   );
 
-  document.querySelectorAll('.feature-card, .example-card, .framework-card, .migration-step, .whats-new-card').forEach((el) => {
+  document.querySelectorAll('.feature-card, .example-card, .framework-card, .migration-step, .whats-new-card, .api-entry').forEach((el) => {
     el.classList.add('fade-in');
     observer.observe(el);
+  });
+
+  // --- Active nav link ---
+  const currentPage = location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a[data-page]').forEach((link) => {
+    if (link.dataset.page === currentPage) {
+      link.classList.add('active');
+    }
   });
 });
