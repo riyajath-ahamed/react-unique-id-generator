@@ -2,7 +2,7 @@
 
 > Unique IDs for React. Readable. Predictable. SSR-safe.
 
-Version: 2.1.0
+Version: 2.2.0
 License: MIT
 Peer dependency: react >=16.8.0
 Zero runtime dependencies.
@@ -41,6 +41,30 @@ import {
   getActiveIdCount,
   cleanupInactiveIds,
   OVERFLOW_THRESHOLD,
+
+  // v2.2 additions
+  generateIdWithStrategy,
+  useIdWithStrategy,
+  numericStrategy,
+  zeroPaddedStrategy,
+  timestampStrategy,
+  hashStrategy,
+  resetStrategyCounter,
+  getStrategyCounter,
+  CollisionDetector,
+  checkCollision,
+  getGlobalCollisionDetector,
+  resetGlobalCollisionDetector,
+  IdPool,
+  useIdPool,
+  SSRProvider,
+  useSSRSafeId,
+  useSSRContext,
+  createSSRIdFactory,
+  generateDelimitedId,
+  useDelimitedId,
+  resetDelimiterCounter,
+  getDelimiterCounter,
 } from 'react-unique-id-generator';
 
 // Legacy (deprecated, still functional):
@@ -65,6 +89,15 @@ import type {
   AutomationIdStrategy,   // 'sequential' | 'kebab-case' | 'camelCase' | 'custom'
   AutomationIdOptions,
   IdMetrics,              // { totalGenerated, activeCount, peakActiveCount }
+
+  // v2.2 additions
+  IdStrategy,             // { generate(prefix, suffix, counter): string }
+  CollisionAction,        // 'warn' | 'throw' | 'skip'
+  CollisionDetectorOptions,
+  IdPoolOptions,
+  SSRContextValue,
+  SSRProviderProps,
+  DelimitedIdOptions,
 } from 'react-unique-id-generator';
 ```
 
@@ -413,6 +446,304 @@ This helps catch:
 
 ---
 
+## Custom ID Strategies
+
+### `IdStrategy` interface
+
+```ts
+interface IdStrategy {
+  generate(prefix: string, suffix: string, counter: number): string;
+}
+```
+
+### Built-in strategies
+
+- `numericStrategy` - Default format: `"prefix1suffix"`
+- `zeroPaddedStrategy(width?)` - Zero-padded counter: `"prefix0001suffix"` (default width: 4)
+- `timestampStrategy` - Timestamp + counter: `"prefix1714300000000-1suffix"`
+- `hashStrategy` - Deterministic 8-char hex hash: `"prefixa3f2b1c0suffix"`
+
+### `generateIdWithStrategy(strategy: IdStrategy, prefix?: string, suffix?: string): string`
+
+Generate an ID using a strategy outside of React components. Increments an internal strategy counter.
+
+```ts
+generateIdWithStrategy(numericStrategy, 'item-')        // "item-1"
+generateIdWithStrategy(zeroPaddedStrategy(4), 'id-')    // "id-0002"
+generateIdWithStrategy(hashStrategy, 'h-')              // "h-a3f2b1c0"
+```
+
+### `useIdWithStrategy(strategy: IdStrategy, prefix?: string, suffix?: string): string`
+
+React hook that generates a stable ID using the given strategy. Persists across re-renders.
+Works with `<IdProvider>` context when available.
+
+```tsx
+function OrderItem() {
+  const id = useIdWithStrategy(zeroPaddedStrategy(6), 'order-');
+  return <div id={id}>...</div>;
+  // => <div id="order-000001">...</div>
+}
+```
+
+### Custom strategy example
+
+```ts
+const base36Strategy: IdStrategy = {
+  generate(prefix, suffix, counter) {
+    return `${prefix}${counter.toString(36)}${suffix}`;
+  },
+};
+
+generateIdWithStrategy(base36Strategy, 'x-')  // "x-1", "x-2", ... "x-a"
+```
+
+### `resetStrategyCounter(): void`
+
+Reset the strategy counter to 0. Useful in test setup.
+
+### `getStrategyCounter(): number`
+
+Get the current strategy counter value.
+
+---
+
+## Collision Detection
+
+Track generated IDs and detect duplicates. Useful for debugging, testing, or enforcing uniqueness.
+
+### `CollisionDetector`
+
+```ts
+const detector = new CollisionDetector({ action: 'throw' });
+```
+
+Constructor options:
+- `action?: 'warn' | 'throw' | 'skip'` (default: `'warn'`) - Behavior on collision
+- `maxSize?: number` (default: `100000`) - Maximum registry size before warning
+
+Methods:
+- `register(id: string): boolean` - Register an ID. Returns `false` on collision
+- `has(id: string): boolean` - Check if an ID is registered
+- `unregister(id: string): boolean` - Remove an ID from the registry
+- `clear(): void` - Clear all registrations and reset collision count
+- `getRegisteredIds(): string[]` - Get all registered IDs
+- `size: number` - Number of registered IDs (getter)
+- `collisions: number` - Total collisions detected (getter)
+
+```ts
+const detector = new CollisionDetector({ action: 'throw' });
+detector.register('input-1');   // true
+detector.register('input-2');   // true
+detector.register('input-1');   // throws Error: ID collision detected
+detector.has('input-1');        // true
+detector.unregister('input-1'); // true
+detector.clear();               // reset everything
+```
+
+### `checkCollision(id: string, action?: CollisionAction): boolean`
+
+Convenience function using a global singleton detector.
+Returns `true` if ID was registered successfully, `false` on collision.
+
+```ts
+checkCollision('field-1');          // true
+checkCollision('field-1', 'skip');  // false (duplicate)
+checkCollision('field-1', 'throw'); // throws Error
+```
+
+### `getGlobalCollisionDetector(options?): CollisionDetector`
+
+Access (or create) the global singleton collision detector.
+
+### `resetGlobalCollisionDetector(): void`
+
+Reset the global detector (clears registry, destroys singleton).
+
+---
+
+## ID Pool Management
+
+Pre-allocate IDs for high-throughput scenarios. The `IdPool` class is a generic pool
+(distinct from `AutomationIdPool` which is automation-specific).
+
+### `IdPool`
+
+```ts
+const pool = new IdPool(size: number, options?: IdPoolOptions)
+```
+
+Options:
+- `prefix?: string` (default: `""`) - Prefix for generated IDs
+- `suffix?: string` (default: `""`) - Suffix for generated IDs
+- `autoRefill?: boolean` (default: `true`) - Auto-generate new IDs when pool is exhausted
+- `generator?: (index: number) => string` - Custom ID generator function
+
+Methods:
+- `acquire(): string` - Get the next available ID (reuses released IDs first)
+- `release(id: string): void` - Return an ID to the pool for reuse
+- `drain(): void` - Clear all available and released IDs
+- `refill(count: number): void` - Add more pre-generated IDs to the pool
+- `size: number` - Number of available + released IDs (getter)
+- `totalGenerated: number` - Total IDs ever generated by this pool (getter)
+
+```ts
+const pool = new IdPool(100, { prefix: 'widget-', suffix: '-el' });
+const id1 = pool.acquire();  // "widget-1-el"
+const id2 = pool.acquire();  // "widget-2-el"
+pool.release(id1);           // Return to pool
+pool.acquire();              // "widget-1-el" (reused)
+pool.drain();                // Clear all
+pool.refill(50);             // Add 50 new IDs
+
+// Custom generator
+const custom = new IdPool(50, {
+  generator: (i) => `session-${Date.now()}-${i}`,
+});
+```
+
+### `useIdPool(size: number, prefix?: string): () => string`
+
+React hook that pre-generates a pool of IDs and returns an `acquire` function.
+The pool is stable across re-renders. Works with `<IdProvider>` context when available.
+
+```tsx
+function DynamicList({ items }) {
+  const acquireId = useIdPool(20, 'item-');
+  return items.map((item) => (
+    <li key={acquireId()} id={acquireId()}>
+      {item.name}
+    </li>
+  ));
+}
+```
+
+---
+
+## SSR Utilities (v2.2)
+
+Enhanced server-side rendering support beyond `createServerIdManager`.
+These provide React context-based isolation and request-scoped ID namespacing.
+
+### `<SSRProvider>`
+
+React context provider that scopes IDs per server request. Use `requestId` to namespace
+IDs for deterministic, collision-free SSR output.
+
+Props:
+- `prefix?: string` (default: `""`) - Default prefix for IDs
+- `suffix?: string` (default: `""`) - Suffix appended to all IDs
+- `requestId?: string` - Request identifier for namespacing (e.g., a short UUID)
+- `children: ReactNode`
+
+```tsx
+// Server render
+function App({ requestId }) {
+  return (
+    <SSRProvider requestId={requestId} prefix="app-" suffix="-el">
+      <Form />
+    </SSRProvider>
+  );
+}
+
+function Form() {
+  const emailId = useSSRSafeId('email-');  // "email-req123-1-el"
+  const passId = useSSRSafeId('pass-');    // "pass-req123-2-el"
+  return (
+    <form>
+      <label htmlFor={emailId}>Email</label>
+      <input id={emailId} />
+    </form>
+  );
+}
+```
+
+### `useSSRSafeId(prefix?: string): string`
+
+React hook for generating IDs inside an `<SSRProvider>`. Falls back to a timestamp-based
+ID outside a provider (with a dev warning). Stable across re-renders.
+
+### `useSSRContext(): SSRContextValue | null`
+
+Access the SSR provider context directly. Returns `null` outside an `<SSRProvider>`.
+
+SSRContextValue methods:
+- `nextId(prefix?: string): string` - Generate next request-scoped ID
+- `resetId(): void` - Reset counter to 0
+- `getCurrentId(): number` - Get current counter value
+
+### `createSSRIdFactory(requestId: string, prefix?: string, suffix?: string)`
+
+Non-React factory for server-side ID generation with request scoping.
+Each factory is fully independent.
+
+Returns:
+- `nextId(localPrefix?: string): string` - Generate next request-scoped ID
+- `resetId(): void` - Reset counter to 0
+- `getCurrentId(): number` - Get current counter value
+
+```ts
+// Express middleware
+app.get('*', (req, res) => {
+  const ids = createSSRIdFactory(req.id, 'ssr-');
+  const headerId = ids.nextId();     // "ssr-abc123-1"
+  const contentId = ids.nextId();    // "ssr-abc123-2"
+  ids.resetId();                     // Reset for reuse
+});
+```
+
+---
+
+## Custom Delimiters
+
+Control how prefix, counter, and suffix are joined. By default, the library concatenates
+parts directly (`prefix + counter + suffix`). The delimiter API lets you specify any separator.
+
+### `generateDelimitedId(options?: DelimitedIdOptions): string`
+
+Generate an ID with parts joined by a custom delimiter. Empty parts are omitted.
+
+Options:
+- `prefix?: string` (default: `""`) - Prefix part
+- `suffix?: string` (default: `""`) - Suffix part
+- `delimiter?: string` (default: `"-"`) - Separator between parts
+
+```ts
+generateDelimitedId({ prefix: 'app', delimiter: '.' })
+// "app.1"
+
+generateDelimitedId({ prefix: 'com', suffix: 'widget', delimiter: '.' })
+// "com.2.widget"
+
+generateDelimitedId({ prefix: 'ns', suffix: 'item', delimiter: '::' })
+// "ns::3::item"
+
+generateDelimitedId()  // "1" (no prefix/suffix, just counter)
+```
+
+### `useDelimitedId(prefix?: string, delimiter?: string, suffix?: string): string`
+
+React hook version. Returns a stable delimited ID across re-renders.
+Works with `<IdProvider>` context when available.
+
+```tsx
+function Widget() {
+  const id = useDelimitedId('widget', '.', 'container');
+  return <div id={id}>...</div>;
+  // => <div id="widget.1.container">...</div>
+}
+```
+
+### `resetDelimiterCounter(): void`
+
+Reset the delimiter counter to 0.
+
+### `getDelimiterCounter(): number`
+
+Get the current delimiter counter value.
+
+---
+
 ## Legacy Functions (Deprecated)
 
 These use global state. They emit a one-time deprecation warning in development.
@@ -572,6 +903,100 @@ function IdDebugger() {
       Active: {activeCount} | Peak: {peakActiveCount} | Total: {totalGenerated}
     </div>
   );
+}
+```
+
+### Custom BEM-style strategy
+
+```tsx
+import { useIdWithStrategy } from 'react-unique-id-generator';
+import type { IdStrategy } from 'react-unique-id-generator';
+
+const bemStrategy: IdStrategy = {
+  generate(prefix, suffix, counter) {
+    return `${prefix}__element-${counter}${suffix ? `--${suffix}` : ''}`;
+  },
+};
+
+function Card() {
+  const id = useIdWithStrategy(bemStrategy, 'card', 'active');
+  return <div id={id}>...</div>;
+  // => <div id="card__element-1--active">...</div>
+}
+```
+
+### Collision-safe ID generation
+
+```ts
+import { CollisionDetector, generateIdWithStrategy, numericStrategy } from 'react-unique-id-generator';
+
+const detector = new CollisionDetector({ action: 'throw' });
+
+function safeGenerateId(prefix: string): string {
+  const id = generateIdWithStrategy(numericStrategy, prefix);
+  detector.register(id);  // Throws if duplicate
+  return id;
+}
+```
+
+### Dynamic list with pre-allocated ID pool
+
+```tsx
+import { useIdPool } from 'react-unique-id-generator';
+
+function TodoList({ items }) {
+  const acquireId = useIdPool(items.length, 'todo-');
+  return (
+    <ul>
+      {items.map((item) => {
+        const id = acquireId();
+        return (
+          <li key={id}>
+            <label htmlFor={id}>{item}</label>
+            <input id={id} type="checkbox" />
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+```
+
+### SSR with request-scoped IDs
+
+```tsx
+import { SSRProvider, useSSRSafeId } from 'react-unique-id-generator';
+
+function handleRequest(requestId: string) {
+  return renderToString(
+    <SSRProvider requestId={requestId} prefix="app-">
+      <Page />
+    </SSRProvider>
+  );
+  // IDs: "app-abc123-1", "app-abc123-2", ...
+}
+
+function Page() {
+  const headerId = useSSRSafeId('header-');
+  const contentId = useSSRSafeId('content-');
+  return (
+    <div>
+      <header id={headerId}>...</header>
+      <main id={contentId}>...</main>
+    </div>
+  );
+}
+```
+
+### Dot-delimited namespace IDs
+
+```tsx
+import { useDelimitedId } from 'react-unique-id-generator';
+
+function Widget({ section }) {
+  const id = useDelimitedId(section, '.', 'widget');
+  return <div id={id}>...</div>;
+  // useDelimitedId('sidebar', '.', 'widget') => "sidebar.1.widget"
 }
 ```
 

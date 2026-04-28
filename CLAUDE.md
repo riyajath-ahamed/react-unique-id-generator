@@ -32,6 +32,11 @@ All source lives in `lib/`:
 - `lib/secure.ts` — `generateSecureId()` for cryptographically random IDs using `crypto.randomUUID`/`getRandomValues` with fallback.
 - `lib/scope.ts` — Scoped ID management: `nextIdForScope`, `resetIdForScope`, `resetAllScopes`, `getScopeCounter`, `getActiveScopes`.
 - `lib/performance.ts` — Memory-efficient tracked hooks (`useTrackedUniqueId`, `useTrackedUniqueIds`), performance monitoring (`useIdMetrics`, `getIdMetrics`, `getActiveIdCount`).
+- `lib/strategy.ts` — Custom ID generation strategies: `IdStrategy` interface, built-in strategies (`numericStrategy`, `zeroPaddedStrategy`, `timestampStrategy`, `hashStrategy`), `generateIdWithStrategy`, `useIdWithStrategy` hook.
+- `lib/collision.ts` — ID collision detection: `CollisionDetector` class with configurable actions (`warn`, `throw`, `skip`), global singleton via `getGlobalCollisionDetector`, `checkCollision` convenience function.
+- `lib/pool.ts` — Generic ID pool management: `IdPool` class with acquire/release/drain/refill, custom generators, auto-refill. `useIdPool` React hook.
+- `lib/ssr.ts` — SSR-specific utilities: `SSRProvider` component with `requestId` for per-request isolation, `useSSRSafeId` hook, `createSSRIdFactory` for non-React SSR.
+- `lib/delimiter.ts` — Custom delimiter support: `generateDelimitedId` and `useDelimitedId` for joining prefix/counter/suffix with arbitrary delimiters.
 - `lib/index.ts` — Re-exports everything. This is the build entry point.
 
 ### Build Output
@@ -60,6 +65,11 @@ Tests live in `tests/`. Framework: **Jest** with **ts-jest** and **jsdom** envir
 - `tests/scope.test.ts` — Scoped ID management tests
 - `tests/performance.test.tsx` — Tracked hooks, cleanup, and metrics tests
 - `tests/edge-cases.test.tsx` — Rapid mount/unmount, large ID counts, boundary values
+- `tests/strategy.test.tsx` — Custom strategy functions, built-in strategies, `useIdWithStrategy` hook
+- `tests/collision.test.ts` — CollisionDetector class, global detector, `checkCollision`
+- `tests/pool.test.tsx` — IdPool class, `useIdPool` hook, auto-refill, custom generators
+- `tests/ssr.test.tsx` — SSRProvider, `useSSRSafeId`, `createSSRIdFactory`, request isolation
+- `tests/delimiter.test.tsx` — `generateDelimitedId`, `useDelimitedId`, custom delimiter patterns
 - `tests/setup.ts` — Jest setup (imports `@testing-library/jest-dom`)
 - `tests/types.d.ts` — Test type declarations
 
@@ -85,6 +95,11 @@ GitHub Actions workflows in `.github/workflows/`:
 - **Scoped counters** are stored in a module-level `Map<string, number>`. Each scope is fully independent.
 - **Tracked IDs** use a module-level `Set<string>` registry. `useTrackedUniqueId` adds on mount, removes on unmount via `useEffect` cleanup.
 - **`useIdMetrics`** uses `useSyncExternalStore` with a cached snapshot object to avoid infinite render loops.
+- **`IdStrategy`** is a simple interface: `generate(prefix, suffix, counter) => string`. Built-in strategies are plain objects/factories, not classes.
+- **`CollisionDetector`** uses a `Set<string>` registry. Configurable `action` determines behavior on collision: `warn` (dev console), `throw` (error), or `skip` (silent). A global singleton is available via `getGlobalCollisionDetector`.
+- **`IdPool`** is a generic pool (distinct from `AutomationIdPool` which is automation-specific). Supports custom generators, auto-refill, and acquire/release semantics.
+- **`SSRProvider`** is a React context provider that accepts a `requestId` prop to namespace IDs per server request. `createSSRIdFactory` is the non-React equivalent for plain server code.
+- **`generateDelimitedId`** joins prefix, counter, and suffix with an arbitrary delimiter (default `"-"`). Parts are only included if non-empty.
 
 ## Code Style
 
