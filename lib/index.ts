@@ -45,6 +45,46 @@ import {
 } from "./performance";
 import type { IdMetrics } from "./performance";
 
+import {
+  generateIdWithStrategy,
+  useIdWithStrategy,
+  numericStrategy,
+  zeroPaddedStrategy,
+  timestampStrategy,
+  hashStrategy,
+  resetStrategyCounter,
+  getStrategyCounter,
+} from "./strategy";
+import type { IdStrategy } from "./strategy";
+
+import {
+  CollisionDetector,
+  getGlobalCollisionDetector,
+  resetGlobalCollisionDetector,
+  checkCollision,
+} from "./collision";
+import type { CollisionAction, CollisionDetectorOptions } from "./collision";
+
+import { IdPool, useIdPool } from "./pool";
+import type { IdPoolOptions } from "./pool";
+
+import {
+  SSRProvider,
+  SSRContext,
+  useSSRContext,
+  useSSRSafeId,
+  createSSRIdFactory,
+} from "./ssr";
+import type { SSRContextValue, SSRProviderProps } from "./ssr";
+
+import {
+  generateDelimitedId,
+  useDelimitedId,
+  resetDelimiterCounter,
+  getDelimiterCounter,
+} from "./delimiter";
+import type { DelimitedIdOptions } from "./delimiter";
+
 export {
   nextId as default,
   resetId,
@@ -83,6 +123,39 @@ export {
   resetIdMetrics,
   getActiveIdCount,
   cleanupInactiveIds,
+
+  // v2.2.0: Custom ID strategies
+  generateIdWithStrategy,
+  useIdWithStrategy,
+  numericStrategy,
+  zeroPaddedStrategy,
+  timestampStrategy,
+  hashStrategy,
+  resetStrategyCounter,
+  getStrategyCounter,
+
+  // v2.2.0: Collision detection
+  CollisionDetector,
+  getGlobalCollisionDetector,
+  resetGlobalCollisionDetector,
+  checkCollision,
+
+  // v2.2.0: ID pool management
+  IdPool,
+  useIdPool,
+
+  // v2.2.0: SSR utilities
+  SSRProvider,
+  SSRContext,
+  useSSRContext,
+  useSSRSafeId,
+  createSSRIdFactory,
+
+  // v2.2.0: Custom delimiter support
+  generateDelimitedId,
+  useDelimitedId,
+  resetDelimiterCounter,
+  getDelimiterCounter,
 };
 
 export type {
@@ -93,4 +166,11 @@ export type {
   AutomationIdStrategy,
   AutomationIdOptions,
   IdMetrics,
+  IdStrategy,
+  CollisionAction,
+  CollisionDetectorOptions,
+  IdPoolOptions,
+  SSRContextValue,
+  SSRProviderProps,
+  DelimitedIdOptions,
 };
