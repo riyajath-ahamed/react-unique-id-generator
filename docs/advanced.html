@@ -3,13 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Advanced Features - react-unique-id-generator</title>
-  <meta name="description" content="v2.2 advanced features: custom ID strategies, collision detection, ID pool management, SSR provider, and custom delimiters." />
+  <title>Advanced Features - react-unique-id-generator | Custom Strategies, Collision Detection, ID Pools</title>
+  <meta name="description" content="Advanced features in react-unique-id-generator v2.2: custom ID generation strategies (numeric, timestamp, hash), collision detection with configurable actions, ID pool management with auto-refill, SSR provider with per-request isolation, and custom delimiters." />
+  <meta name="keywords" content="react id strategy, custom id generation, collision detection react, IdPool react, SSR provider react, react id delimiter, react timestamp id, react hash id, zero-padded id, react id pool management" />
+  <meta name="author" content="Riyajath Ahamed" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/advanced.html" />
+
+  <meta property="og:title" content="Advanced Features - react-unique-id-generator" />
+  <meta property="og:description" content="Custom ID strategies, collision detection, ID pool management, SSR provider with per-request isolation, and custom delimiters in react-unique-id-generator v2.2." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://riyajath-ahamed.github.io/react-unique-id-generator/advanced.html" />
+  <meta property="og:site_name" content="react-unique-id-generator" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Advanced Features - react-unique-id-generator" />
+  <meta name="twitter:description" content="Custom ID strategies, collision detection, ID pools, SSR provider, and custom delimiters." />
+
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Advanced Features - react-unique-id-generator",
+    "description": "Guide to advanced features in react-unique-id-generator v2.2: custom ID strategies, collision detection, ID pools, SSR provider, and custom delimiters.",
+    "url": "https://riyajath-ahamed.github.io/react-unique-id-generator/advanced.html",
+    "author": {
+      "@type": "Person",
+      "name": "Riyajath Ahamed",
+      "url": "https://github.com/riyajath-ahamed"
+    },
+    "about": {
+      "@type": "SoftwareSourceCode",
+      "name": "react-unique-id-generator",
+      "url": "https://github.com/riyajath-ahamed/react-unique-id-generator"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Advanced Features",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/advanced.html"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <nav class="nav" id="nav">
@@ -33,6 +89,7 @@
     </div>
   </nav>
 
+  <main>
   <section class="page-header">
     <div class="container">
       <div class="hero-badge">v2.2</div>
@@ -355,6 +412,7 @@ app.<span class="fn">get</span>(<span class="str">'*'</span>, (req, res) =&gt; {
       </div>
     </div>
   </section>
+  </main>
 
   <footer class="footer">
     <div class="container">

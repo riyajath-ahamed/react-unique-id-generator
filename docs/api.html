@@ -3,13 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Reference - react-unique-id-generator</title>
-  <meta name="description" content="Complete API reference for react-unique-id-generator: Provider, Hooks, SSR, Automation, Secure IDs, Scoped Resets, Performance Monitoring." />
+  <title>API Reference - react-unique-id-generator | Hooks, Provider, SSR, Strategies</title>
+  <meta name="description" content="Complete API reference for react-unique-id-generator. Documentation for useUniqueId, IdProvider, nextId, SSR utilities, custom strategies, collision detection, ID pools, secure IDs, scoped counters, and performance monitoring." />
+  <meta name="keywords" content="react-unique-id-generator API, useUniqueId hook, IdProvider, nextId, react id hooks, SSR id generation, collision detection API, IdPool, IdStrategy, react id documentation" />
+  <meta name="author" content="Riyajath Ahamed" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/api.html" />
+
+  <meta property="og:title" content="API Reference - react-unique-id-generator" />
+  <meta property="og:description" content="Complete API docs for useUniqueId, IdProvider, nextId, SSR utilities, custom strategies, collision detection, ID pools, and performance monitoring." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://riyajath-ahamed.github.io/react-unique-id-generator/api.html" />
+  <meta property="og:site_name" content="react-unique-id-generator" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="API Reference - react-unique-id-generator" />
+  <meta name="twitter:description" content="Complete API docs for useUniqueId, IdProvider, nextId, SSR utilities, custom strategies, and collision detection." />
+
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "API Reference - react-unique-id-generator",
+    "description": "Complete API reference for react-unique-id-generator library including hooks, providers, SSR utilities, custom strategies, collision detection, and performance monitoring.",
+    "url": "https://riyajath-ahamed.github.io/react-unique-id-generator/api.html",
+    "author": {
+      "@type": "Person",
+      "name": "Riyajath Ahamed",
+      "url": "https://github.com/riyajath-ahamed"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Riyajath Ahamed"
+    },
+    "about": {
+      "@type": "SoftwareSourceCode",
+      "name": "react-unique-id-generator",
+      "url": "https://github.com/riyajath-ahamed/react-unique-id-generator"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "API Reference",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/api.html"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <nav class="nav" id="nav">
@@ -33,6 +93,7 @@
     </div>
   </nav>
 
+  <main>
   <section class="page-header">
     <div class="container">
       <div class="hero-badge">Core API</div>
@@ -301,6 +362,7 @@ pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</sp
       </div>
     </div>
   </section>
+  </main>
 
   <footer class="footer">
     <div class="container">
