@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference - react-unique-id-generator</title>
+  <meta name="description" content="Complete API reference for react-unique-id-generator: Provider, Hooks, SSR, Automation, Secure IDs, Scoped Resets, Performance Monitoring." />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo"><img src="favicon.ico" width="11" /> react-unique-id-generator</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html" data-page="index.html">Home</a></li>
+        <li><a href="api.html" data-page="api.html">API</a></li>
+        <li><a href="advanced.html" data-page="advanced.html">Advanced</a></li>
+        <li><a href="examples.html" data-page="examples.html">Examples</a></li>
+        <li>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" class="nav-github" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="page-header">
+    <div class="container">
+      <div class="hero-badge">Core API</div>
+      <h1>API Reference</h1>
+      <p>Provider, Hooks, SSR, Automation, Secure IDs, Scoped Resets, Performance Monitoring, and Legacy functions.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="tabs" id="api-tabs">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="api-provider">Provider</button>
+          <button class="tab-btn" data-tab="api-hooks">Hooks</button>
+          <button class="tab-btn" data-tab="api-ssr">SSR</button>
+          <button class="tab-btn" data-tab="api-automation">Automation</button>
+          <button class="tab-btn" data-tab="api-secure">Secure & Scope</button>
+          <button class="tab-btn" data-tab="api-performance">Performance</button>
+          <button class="tab-btn" data-tab="api-legacy">Legacy</button>
+        </div>
+
+        <div class="tab-panel active" data-panel="api-provider">
+          <div class="api-entry">
+            <h3><code>&lt;IdProvider&gt;</code></h3>
+            <p>Context provider that scopes ID state to its subtree. Each provider has an independent counter.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td><td>Prefix for all IDs in this scope</td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td><td>Suffix for all IDs in this scope</td></tr>
+                  <tr><td><code>startId</code></td><td><code>number</code></td><td><code>0</code></td><td>Initial counter value</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code>&lt;<span class="tag">IdProvider</span> <span class="attr">prefix</span>=<span class="str">"page-"</span>&gt;
+  &lt;<span class="tag">Header</span> /&gt;          <span class="cm">{/* "page-1" */}</span>
+  &lt;<span class="tag">IdProvider</span> <span class="attr">prefix</span>=<span class="str">"modal-"</span>&gt;
+    &lt;<span class="tag">ModalContent</span> /&gt;  <span class="cm">{/* "modal-1" */}</span>
+  &lt;/<span class="tag">IdProvider</span>&gt;
+  &lt;<span class="tag">Footer</span> /&gt;          <span class="cm">{/* "page-2" */}</span>
+&lt;/<span class="tag">IdProvider</span>&gt;</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdContext(): IdContextValue | null</code></h3>
+            <p>Access the current provider's context. Returns <code>null</code> outside a provider.</p>
+            <pre><code><span class="kw">const</span> ctx = <span class="fn">useIdContext</span>();
+<span class="kw">if</span> (ctx) console.<span class="fn">log</span>(ctx.prefix);</code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-hooks">
+          <div class="api-entry">
+            <h3><code>useUniqueId(localPrefix?: string): string</code></h3>
+            <p>Stable unique ID on mount. Persists across re-renders.</p>
+            <pre><code><span class="kw">function</span> <span class="fn">MyInput</span>() {
+  <span class="kw">const</span> id = <span class="fn">useUniqueId</span>(<span class="str">'input-'</span>);  <span class="cm">// "input-1"</span>
+  <span class="kw">return</span> (
+    &lt;<span class="tag">div</span>&gt;
+      &lt;<span class="tag">label</span> <span class="attr">htmlFor</span>={id}&gt;Name&lt;/<span class="tag">label</span>&gt;
+      &lt;<span class="tag">input</span> <span class="attr">id</span>={id} /&gt;
+    &lt;/<span class="tag">div</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useUniqueIds(count: number, localPrefix?: string): string[]</code></h3>
+            <p>Multiple stable IDs at once.</p>
+            <pre><code><span class="kw">const</span> [emailId, passId] = <span class="fn">useUniqueIds</span>(<span class="num">2</span>, <span class="str">'login-'</span>);
+<span class="cm">// ["login-1", "login-2"]</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-ssr">
+          <div class="api-entry">
+            <h3><code>createServerIdManager(options?): ServerIdManager</code></h3>
+            <p>Isolated ID manager for SSR. One instance per request.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th></tr></thead>
+                <tbody>
+                  <tr><td><code>prefix</code></td><td><code>string</code></td><td><code>""</code></td></tr>
+                  <tr><td><code>suffix</code></td><td><code>string</code></td><td><code>""</code></td></tr>
+                  <tr><td><code>startId</code></td><td><code>number</code></td><td><code>0</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">createServerIdManager</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+app.<span class="fn">get</span>(<span class="str">'*'</span>, (req, res) =&gt; {
+  <span class="kw">const</span> ids = <span class="fn">createServerIdManager</span>({ prefix: <span class="str">'ssr-'</span> });
+
+  <span class="kw">const</span> headerId  = ids.<span class="fn">nextId</span>();        <span class="cm">// "ssr-1"</span>
+  <span class="kw">const</span> contentId = ids.<span class="fn">nextId</span>();        <span class="cm">// "ssr-2"</span>
+  <span class="kw">const</span> navId     = ids.<span class="fn">nextId</span>(<span class="str">'nav-'</span>);  <span class="cm">// "nav-3"</span>
+});</code></pre>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>nextId(localPrefix?)</code></td><td><code>string</code></td><td>Next ID</td></tr>
+                  <tr><td><code>resetId()</code></td><td><code>void</code></td><td>Reset counter</td></tr>
+                  <tr><td><code>getCurrentId()</code></td><td><code>number</code></td><td>Current counter</td></tr>
+                  <tr><td><code>setId(id)</code></td><td><code>void</code></td><td>Set counter</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-automation">
+          <div class="api-entry">
+            <h3>Naming Strategies</h3>
+            <div class="strategy-grid">
+              <div class="strategy-card">
+                <div class="strategy-name">sequential</div>
+                <code>"Button-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">kebab-case</div>
+                <code>"user-profile-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">camelCase</div>
+                <code>"myButton-1"</code>
+              </div>
+              <div class="strategy-card">
+                <div class="strategy-name">custom</div>
+                <code>"e2e__Btn__1"</code>
+              </div>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3><code>generateAutomationId(componentName, options?): string</code></h3>
+            <pre><code><span class="fn">generateAutomationId</span>(<span class="str">'Button'</span>)                                    <span class="cm">// "Button-1"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'UserProfile'</span>, { strategy: <span class="str">'kebab-case'</span> })   <span class="cm">// "user-profile-2"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'myButton'</span>, { strategy: <span class="str">'camelCase'</span> })       <span class="cm">// "myButton-3"</span>
+<span class="fn">generateAutomationId</span>(<span class="str">'Btn'</span>, { prefix: <span class="str">'qa-'</span>, separator: <span class="str">'_'</span> })   <span class="cm">// "qa-Btn_4"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useAutomationId(componentName, options?): string</code></h3>
+            <p>Hook version. Stable across re-renders.</p>
+            <pre><code><span class="kw">function</span> <span class="fn">SubmitButton</span>() {
+  <span class="kw">const</span> testId = <span class="fn">useAutomationId</span>(<span class="str">'SubmitButton'</span>, { strategy: <span class="str">'kebab-case'</span> });
+  <span class="kw">return</span> &lt;<span class="tag">button</span> <span class="attr">data-testid</span>={testId}&gt;Submit&lt;/<span class="tag">button</span>&gt;;
+  <span class="cm">// &lt;button data-testid="submit-button-1"&gt;</span>
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>AutomationIdPool</code></h3>
+            <p>Pre-allocate IDs for large apps. Acquire, release, reuse.</p>
+            <pre><code><span class="kw">const</span> pool = <span class="kw">new</span> <span class="fn">AutomationIdPool</span>(<span class="num">100</span>, <span class="str">'component'</span>, {
+  strategy: <span class="str">'kebab-case'</span>,
+  prefix: <span class="str">'test-'</span>,
+});
+
+pool.<span class="fn">acquire</span>();   <span class="cm">// "test-component-1"</span>
+pool.<span class="fn">acquire</span>();   <span class="cm">// "test-component-2"</span>
+pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-secure">
+          <div class="api-entry">
+            <h3><code>generateSecureId(length?: number): string</code></h3>
+            <p>Generates a cryptographically random ID. Uses <code>crypto.randomUUID</code> when available, falls back to <code>crypto.getRandomValues</code>, then <code>Math.random</code>.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">generateSecureId</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="fn">generateSecureId</span>();    <span class="cm">// "a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>
+<span class="fn">generateSecureId</span>(<span class="num">16</span>); <span class="cm">// "a1b2c3d4e5f67890" (hex fallback)</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>nextIdForScope(scope, prefix?): string</code></h3>
+            <p>Generate sequential IDs within a named scope. Each scope has an independent counter.</p>
+            <pre><code><span class="fn">nextIdForScope</span>(<span class="str">'form'</span>, <span class="str">'field-'</span>);   <span class="cm">// "field-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'modal'</span>, <span class="str">'modal-'</span>); <span class="cm">// "modal-1"</span>
+<span class="fn">nextIdForScope</span>(<span class="str">'form'</span>, <span class="str">'field-'</span>);   <span class="cm">// "field-2"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Other Scope Utilities</h3>
+            <pre><code><span class="fn">resetIdForScope</span>(<span class="str">'form'</span>);   <span class="cm">// reset one scope</span>
+<span class="fn">resetAllScopes</span>();          <span class="cm">// reset all scope counters</span>
+<span class="fn">getScopeCounter</span>(<span class="str">'form'</span>);   <span class="cm">// 2 (current counter value)</span>
+<span class="fn">getActiveScopes</span>();         <span class="cm">// ["form", "modal"]</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-performance">
+          <div class="api-entry">
+            <h3><code>useTrackedUniqueId(localPrefix?): string</code></h3>
+            <p>Like <code>useUniqueId</code>, but tracks the ID and automatically removes it from the registry on unmount.</p>
+            <pre><code><span class="kw">function</span> <span class="fn">ListItem</span>({ label }) {
+  <span class="kw">const</span> id = <span class="fn">useTrackedUniqueId</span>(<span class="str">'item-'</span>);  <span class="cm">// tracked + auto-cleaned</span>
+  <span class="kw">return</span> &lt;<span class="tag">li</span> <span class="attr">id</span>={id}&gt;{label}&lt;/<span class="tag">li</span>&gt;;
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useIdMetrics(): IdMetrics</code></h3>
+            <p>React hook that subscribes to real-time ID metrics. Re-renders when metrics change.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>totalGenerated</code></td><td><code>number</code></td><td>Total tracked IDs ever created</td></tr>
+                  <tr><td><code>activeCount</code></td><td><code>number</code></td><td>Currently mounted tracked IDs</td></tr>
+                  <tr><td><code>peakActiveCount</code></td><td><code>number</code></td><td>Highest simultaneous active count</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">function</span> <span class="fn">DebugPanel</span>() {
+  <span class="kw">const</span> metrics = <span class="fn">useIdMetrics</span>();
+  <span class="kw">return</span> (
+    &lt;<span class="tag">pre</span>&gt;
+      Active: {metrics.activeCount}
+      Peak:   {metrics.peakActiveCount}
+      Total:  {metrics.totalGenerated}
+    &lt;/<span class="tag">pre</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Utility Functions</h3>
+            <pre><code><span class="fn">getIdMetrics</span>();         <span class="cm">// { totalGenerated, activeCount, peakActiveCount }</span>
+<span class="fn">getActiveIdCount</span>();     <span class="cm">// number of currently tracked IDs</span>
+<span class="fn">resetIdMetrics</span>();       <span class="cm">// reset totalGenerated counter</span>
+<span class="fn">cleanupInactiveIds</span>();  <span class="cm">// clear the entire tracking registry</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Overflow Protection</h3>
+            <p>All counters emit a dev-mode warning when they exceed <code>OVERFLOW_THRESHOLD</code> (1,000,000). Fires once per counter, resets with the counter.</p>
+            <pre><code><span class="kw">import</span> { <span class="fn">OVERFLOW_THRESHOLD</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+<span class="cm">// OVERFLOW_THRESHOLD === 1_000_000</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-legacy">
+          <div class="api-notice">
+            These use global state. Still functional in v2.x with deprecation warnings.
+          </div>
+          <div class="api-entry">
+            <h3><code>nextId(localPrefix?: string | null): string</code></h3>
+            <pre><code><span class="fn">nextId</span>()           <span class="cm">// "1"</span>
+<span class="fn">nextId</span>()           <span class="cm">// "2"</span>
+<span class="fn">nextId</span>(<span class="str">'input-'</span>)   <span class="cm">// "input-3"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>generateId(prefix?, suffix?): string</code></h3>
+            <pre><code><span class="fn">generateId</span>(<span class="str">'btn-'</span>, <span class="str">'-primary'</span>) <span class="cm">// "btn-1-primary"</span>
+<span class="fn">generateId</span>(<span class="str">'icon-'</span>)            <span class="cm">// "icon-2"</span></code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>setGlobalPrefix(prefix)</code> <span class="deprecated-badge">Deprecated</span></h3>
+            <p>Use <code>&lt;IdProvider prefix="..."&gt;</code> instead.</p>
+          </div>
+          <div class="api-entry">
+            <h3><code>setGlobalSuffix(suffix)</code> <span class="deprecated-badge">Deprecated</span></h3>
+            <p>Use <code>&lt;IdProvider suffix="..."&gt;</code> instead.</p>
+          </div>
+          <div class="api-entry">
+            <h3>Other</h3>
+            <pre><code><span class="fn">resetId</span>();          <span class="cm">// reset counter to 0</span>
+<span class="fn">getCurrentId</span>();     <span class="cm">// get current counter value</span>
+<span class="fn">setId</span>(<span class="num">10</span>);           <span class="cm">// set counter to specific value</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>react-unique-id-generator</strong>
+          <p>MIT License. Built by <a href="https://github.com/riyajath-ahamed" target="_blank" rel="noopener">riyajath-ahamed</a>.</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://www.npmjs.com/package/react-unique-id-generator" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/riyajath-ahamed/react-unique-id-generator/issues" target="_blank" rel="noopener">Issues</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -10,6 +10,11 @@ A lightweight, zero-dependency library for generating unique, sequential IDs in 
 - Provider-scoped counters for SSR isolation (no cross-request leaks)
 - Works in React 16.8+ (not just React 18+)
 - Works outside components (utility functions, server code)
+- Pluggable ID generation strategies (numeric, zero-padded, timestamp, hash, or custom)
+- ID collision detection with configurable warn/throw/skip actions
+- ID pool management with acquire/release semantics for high-throughput scenarios
+- Custom delimiters between ID parts (`.`, `::`, `__`, `/`, etc.)
+- SSR request-scoped provider with `requestId` namespacing
 - Automation test ID generation with naming strategies
 - Cryptographically secure random IDs via `generateSecureId()`
 - Scoped ID resets per feature/module
@@ -60,6 +65,30 @@ function Form() {
 - `useAutomationId(componentName, options?)` - Hook version of generateAutomationId
 - `AutomationIdPool` - Pre-allocated pool of automation IDs
 - `nextId(prefix?)` - Legacy: generate next ID using global state
+
+## v2.2 API
+
+- `IdStrategy` interface - `{ generate(prefix, suffix, counter): string }` for custom ID formats
+- `generateIdWithStrategy(strategy, prefix?, suffix?)` - Generate an ID with a pluggable strategy
+- `useIdWithStrategy(strategy, prefix?, suffix?)` - Hook version, stable across re-renders
+- `numericStrategy` - Built-in: `"prefix1suffix"`
+- `zeroPaddedStrategy(width?)` - Built-in: `"prefix0001suffix"` (default width: 4)
+- `timestampStrategy` - Built-in: `"prefix1714300000000-1suffix"`
+- `hashStrategy` - Built-in: `"prefixa3f2b1c0suffix"` (deterministic hash)
+- `resetStrategyCounter()` - Reset the strategy counter to 0
+- `CollisionDetector` - Class to track IDs and detect duplicates (action: 'warn' | 'throw' | 'skip')
+- `checkCollision(id, action?)` - Convenience function using global singleton detector
+- `getGlobalCollisionDetector(options?)` - Access/create global collision detector
+- `resetGlobalCollisionDetector()` - Reset the global detector
+- `IdPool` - Generic ID pool with acquire/release/drain/refill, custom generators, auto-refill
+- `useIdPool(size, prefix?)` - Hook that pre-generates a pool and returns an acquire function
+- `SSRProvider` - React context provider with `requestId` for per-request ID namespacing
+- `useSSRSafeId(prefix?)` - Hook for SSR-safe IDs (falls back outside provider)
+- `useSSRContext()` - Access SSRProvider context
+- `createSSRIdFactory(requestId, prefix?, suffix?)` - Non-React SSR factory
+- `generateDelimitedId(options?)` - Join prefix/counter/suffix with custom delimiter
+- `useDelimitedId(prefix?, delimiter?, suffix?)` - Hook version, stable across re-renders
+- `resetDelimiterCounter()` - Reset the delimiter counter to 0
 
 ## v2.1 API
 
