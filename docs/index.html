@@ -3,17 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>react-unique-id-generator</title>
-  <meta name="description" content="A lightweight, zero-dependency library for generating unique, readable, and SSR-safe IDs in React applications." />
-  <meta name="keywords" content="react, unique id, id generator, SSR, hooks, typescript, accessibility" />
-  <meta property="og:title" content="react-unique-id-generator" />
-  <meta property="og:description" content="Unique IDs for React. Readable. Predictable. SSR-safe." />
+  <title>react-unique-id-generator - Lightweight Unique ID Generation for React | SSR-Safe, Zero Dependencies</title>
+  <meta name="description" content="Generate unique, readable, and SSR-safe IDs in React applications. Zero dependencies, custom strategies, collision detection, ID pools, TypeScript support. The best useId alternative for React 16+." />
+  <meta name="keywords" content="react unique id, react id generator, useId alternative, react hooks id, SSR safe id, react accessibility id, aria id generator, react form id, data-testid generator, typescript react id, react sequential id, react custom id strategy, react collision detection, id pool react, react useUniqueId, nextId react, react component id, unique identifier react, react label id, react input id" />
+  <meta name="author" content="Riyajath Ahamed" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/" />
+
+  <meta property="og:title" content="react-unique-id-generator - Unique ID Generation for React" />
+  <meta property="og:description" content="Lightweight, zero-dependency library for generating unique, readable, and SSR-safe IDs in React. Custom strategies, collision detection, ID pools, and TypeScript support." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://riyajath-ahamed.github.io/react-unique-id-generator/" />
+  <meta property="og:site_name" content="react-unique-id-generator" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="react-unique-id-generator - Unique ID Generation for React" />
+  <meta name="twitter:description" content="Lightweight, zero-dependency library for generating unique, readable, and SSR-safe IDs in React. The best useId alternative." />
+
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "react-unique-id-generator",
+    "description": "A lightweight, zero-dependency library for generating unique, readable, and SSR-safe IDs in React applications. Supports custom strategies, collision detection, ID pools, SSR isolation, and TypeScript.",
+    "url": "https://riyajath-ahamed.github.io/react-unique-id-generator/",
+    "codeRepository": "https://github.com/riyajath-ahamed/react-unique-id-generator",
+    "programmingLanguage": ["TypeScript", "React"],
+    "runtimePlatform": "Node.js",
+    "license": "https://opensource.org/licenses/MIT",
+    "author": {
+      "@type": "Person",
+      "name": "Riyajath Ahamed",
+      "url": "https://github.com/riyajath-ahamed"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "API Reference",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/api.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Advanced Features",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/advanced.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Examples & Migration",
+        "item": "https://riyajath-ahamed.github.io/react-unique-id-generator/examples.html"
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is react-unique-id-generator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "react-unique-id-generator is a lightweight, zero-dependency npm package for generating unique, sequential, and readable IDs in React applications. It provides hooks like useUniqueId, context-based scoping with IdProvider, SSR-safe ID generation, custom strategies, collision detection, and ID pool management. It works with React 16.8+ and is fully typed with TypeScript."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is react-unique-id-generator different from React's built-in useId?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "React's useId (React 18+) generates opaque IDs like :r0: with no customization. react-unique-id-generator gives you readable, prefixed IDs like email-1, works with React 16.8+, supports provider-scoped counters, custom generation strategies (numeric, timestamp, hash), collision detection, ID pools, SSR request isolation, and can be used outside of React components with nextId()."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is react-unique-id-generator safe to use with server-side rendering (SSR)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The library provides multiple SSR-safe approaches: SSRProvider with per-request requestId namespacing to prevent cross-request state leaks, createServerIdManager for isolated per-request counters in API routes, and createSSRIdFactory for non-React server code. It works seamlessly with Next.js, Remix, and Gatsby."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does react-unique-id-generator have any dependencies?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. react-unique-id-generator has zero runtime dependencies. React is a peer dependency only. The library ships tree-shakeable ESM and CommonJS bundles, keeping your bundle size minimal. It is built with TypeScript and ships type declarations out of the box."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I generate unique IDs for form accessibility (ARIA)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the useUniqueId hook with a descriptive prefix: const id = useUniqueId('email-') generates 'email-1'. Use this ID in both htmlFor on label and id on input to create accessible form controls. For multiple IDs, use useUniqueIds to generate a batch. Wrap components in IdProvider to scope counters and prevent collisions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use custom ID formats or strategies with react-unique-id-generator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The IdStrategy interface lets you define custom ID formats. Built-in strategies include numericStrategy, zeroPaddedStrategy, timestampStrategy, and hashStrategy. Use generateIdWithStrategy for one-off generation or the useIdWithStrategy hook in components. You can also use generateDelimitedId to join prefix, counter, and suffix with any custom delimiter."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <nav class="nav" id="nav">
@@ -37,6 +163,7 @@
     </div>
   </nav>
 
+  <main>
   <section class="hero">
     <div class="container">
       <div class="hero-badge">v2.2</div>
@@ -326,6 +453,52 @@
       </div>
     </div>
   </section>
+
+  <section class="section" id="faq">
+    <div class="container">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Common questions about react-unique-id-generator</p>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-question">What is react-unique-id-generator?</summary>
+          <div class="faq-answer">
+            <p>react-unique-id-generator is a lightweight, zero-dependency npm package for generating unique, sequential, and readable IDs in React applications. It provides hooks like <code>useUniqueId</code>, context-based scoping with <code>&lt;IdProvider&gt;</code>, SSR-safe ID generation, custom strategies, collision detection, and ID pool management. It works with React 16.8+ and is fully typed with TypeScript.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">How is this different from React's built-in useId?</summary>
+          <div class="faq-answer">
+            <p>React's <code>useId</code> (React 18+) generates opaque IDs like <code>:r0:</code> with no customization. react-unique-id-generator gives you readable, prefixed IDs like <code>email-1</code>, works with React 16.8+, supports provider-scoped counters, custom generation strategies (numeric, timestamp, hash), collision detection, ID pools, SSR request isolation, and can be used outside of React components with <code>nextId()</code>.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Is it safe to use with server-side rendering (SSR)?</summary>
+          <div class="faq-answer">
+            <p>Yes. The library provides multiple SSR-safe approaches: <code>&lt;SSRProvider&gt;</code> with per-request <code>requestId</code> namespacing to prevent cross-request state leaks, <code>createServerIdManager</code> for isolated per-request counters in API routes, and <code>createSSRIdFactory</code> for non-React server code. It works seamlessly with Next.js, Remix, and Gatsby.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Does it have any dependencies?</summary>
+          <div class="faq-answer">
+            <p>No. react-unique-id-generator has zero runtime dependencies. React is a peer dependency only. The library ships tree-shakeable ESM and CommonJS bundles, keeping your bundle size minimal. It is built with TypeScript and ships type declarations out of the box.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">How do I generate unique IDs for form accessibility (ARIA)?</summary>
+          <div class="faq-answer">
+            <p>Use the <code>useUniqueId</code> hook with a descriptive prefix: <code>const id = useUniqueId('email-')</code> generates <code>"email-1"</code>. Use this ID in both <code>htmlFor</code> on <code>&lt;label&gt;</code> and <code>id</code> on <code>&lt;input&gt;</code> to create accessible form controls. For multiple IDs, use <code>useUniqueIds</code> to generate a batch. Wrap components in <code>&lt;IdProvider&gt;</code> to scope counters and prevent collisions across different parts of your app.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-question">Can I use custom ID formats or strategies?</summary>
+          <div class="faq-answer">
+            <p>Yes. The <code>IdStrategy</code> interface lets you define custom ID formats. Built-in strategies include <code>numericStrategy</code>, <code>zeroPaddedStrategy</code>, <code>timestampStrategy</code>, and <code>hashStrategy</code>. Use <code>generateIdWithStrategy</code> for one-off generation or the <code>useIdWithStrategy</code> hook in components. You can also use <code>generateDelimitedId</code> to join prefix, counter, and suffix with any custom delimiter.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+  </main>
 
   <footer class="footer">
     <div class="container">

@@ -1,6 +1,6 @@
 {
   "name": "react-unique-id-generator",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A lightweight, zero-dependency library for generating unique, sequential IDs in React — with hooks, custom prefix/suffix, and SSR support",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
