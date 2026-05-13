@@ -85,6 +85,13 @@ import {
 } from "./delimiter";
 import type { DelimitedIdOptions } from "./delimiter";
 
+import {
+  generateSelector,
+  useStableSelector,
+  resetSelectorCache,
+} from "./selector";
+import type { SelectorOptions } from "./selector";
+
 export {
   nextId as default,
   resetId,
@@ -156,6 +163,11 @@ export {
   useDelimitedId,
   resetDelimiterCounter,
   getDelimiterCounter,
+
+  // v2.3.0: Stable CSS selector generation
+  generateSelector,
+  useStableSelector,
+  resetSelectorCache,
 };
 
 export type {
@@ -173,4 +185,5 @@ export type {
   SSRContextValue,
   SSRProviderProps,
   DelimitedIdOptions,
+  SelectorOptions,
 };
