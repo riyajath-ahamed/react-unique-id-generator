@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Reference - react-unique-id-generator | Hooks, Provider, SSR, Strategies</title>
-  <meta name="description" content="Complete API reference for react-unique-id-generator. Documentation for useUniqueId, IdProvider, nextId, SSR utilities, custom strategies, collision detection, ID pools, secure IDs, scoped counters, and performance monitoring." />
-  <meta name="keywords" content="react-unique-id-generator API, useUniqueId hook, IdProvider, nextId, react id hooks, SSR id generation, collision detection API, IdPool, IdStrategy, react id documentation" />
+  <meta name="description" content="Complete API reference for react-unique-id-generator. Documentation for useUniqueId, IdProvider, nextId, SSR utilities, custom strategies, collision detection, ID pools, stable CSS selectors, secure IDs, scoped counters, and performance monitoring." />
+  <meta name="keywords" content="react-unique-id-generator API, useUniqueId hook, IdProvider, nextId, react id hooks, SSR id generation, collision detection API, IdPool, IdStrategy, react id documentation, generateSelector, useStableSelector, css selector generation" />
   <meta name="author" content="Riyajath Ahamed" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/api.html" />
@@ -98,7 +98,7 @@
     <div class="container">
       <div class="hero-badge">Core API</div>
       <h1>API Reference</h1>
-      <p>Provider, Hooks, SSR, Automation, Secure IDs, Scoped Resets, Performance Monitoring, and Legacy functions.</p>
+      <p>Provider, Hooks, SSR, Automation, Secure IDs, Scoped Resets, Performance Monitoring, CSS Selectors, and Legacy functions.</p>
     </div>
   </section>
 
@@ -112,6 +112,7 @@
           <button class="tab-btn" data-tab="api-automation">Automation</button>
           <button class="tab-btn" data-tab="api-secure">Secure & Scope</button>
           <button class="tab-btn" data-tab="api-performance">Performance</button>
+          <button class="tab-btn" data-tab="api-selectors">Selectors</button>
           <button class="tab-btn" data-tab="api-legacy">Legacy</button>
         </div>
 
@@ -326,6 +327,76 @@ pool.<span class="fn">release</span>(id); <span class="cm">// return to pool</sp
             <p>All counters emit a dev-mode warning when they exceed <code>OVERFLOW_THRESHOLD</code> (1,000,000). Fires once per counter, resets with the counter.</p>
             <pre><code><span class="kw">import</span> { <span class="fn">OVERFLOW_THRESHOLD</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
 <span class="cm">// OVERFLOW_THRESHOLD === 1_000_000</span></code></pre>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="api-selectors">
+          <div class="api-entry">
+            <h3><code>generateSelector(element, options?): string</code></h3>
+            <p>Generate a unique, human-readable CSS selector for a DOM element. Tries strategies in priority order: stable ID, data attributes, ARIA roles, semantic attributes, CSS classes, landmark tags, then ancestor traversal.</p>
+            <div class="api-props">
+              <table>
+                <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+                <tbody>
+                  <tr><td><code>root</code></td><td><code>Element</code></td><td><code>document</code></td><td>Scope uniqueness checks to a subtree</td></tr>
+                  <tr><td><code>dataAttributes</code></td><td><code>string[]</code></td><td><code>['data-testid', ...]</code></td><td>Data attributes to check (in priority order)</td></tr>
+                  <tr><td><code>maxDepth</code></td><td><code>number</code></td><td><code>5</code></td><td>Max ancestor levels to traverse</td></tr>
+                  <tr><td><code>ignoreIdPattern</code></td><td><code>RegExp</code></td><td><code>/^[:.]|^\d/</code></td><td>IDs matching this are skipped as dynamic</td></tr>
+                  <tr><td><code>ignoreClassPattern</code></td><td><code>RegExp</code></td><td>-</td><td>Classes matching this are excluded</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">generateSelector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">const</span> btn = document.<span class="fn">querySelector</span>(<span class="str">'button.submit'</span>);
+<span class="kw">const</span> selector = <span class="fn">generateSelector</span>(btn);
+<span class="cm">// e.g. "button.submit" or "#form button.submit"</span>
+
+<span class="cm">// Custom options</span>
+<span class="fn">generateSelector</span>(el, {
+  dataAttributes: [<span class="str">'data-qa'</span>],
+  ignoreClassPattern: <span class="str">/^css-|^sc-/</span>,
+  maxDepth: <span class="num">3</span>,
+});</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3><code>useStableSelector(ref, options?): string | null</code></h3>
+            <p>React hook that computes a stable CSS selector for a ref'd element once on mount. Returns <code>null</code> until the ref is attached.</p>
+            <pre><code><span class="kw">import</span> { useRef } <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> { <span class="fn">useStableSelector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">TrackedButton</span>() {
+  <span class="kw">const</span> ref = <span class="fn">useRef</span>&lt;<span class="type">HTMLButtonElement</span>&gt;(<span class="kw">null</span>);
+  <span class="kw">const</span> selector = <span class="fn">useStableSelector</span>(ref);
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag">button</span> <span class="attr">ref</span>={ref}
+      <span class="attr">onClick</span>={() =&gt; analytics.<span class="fn">track</span>(<span class="str">'click'</span>, { selector })}&gt;
+      Click me
+    &lt;/<span class="tag">button</span>&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="api-entry">
+            <h3>Selector Priority Chain</h3>
+            <div class="api-methods">
+              <table>
+                <thead><tr><th>Priority</th><th>Strategy</th><th>Example</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td>Stable ID</td><td><code>#my-element</code></td></tr>
+                  <tr><td>2</td><td>Data attributes</td><td><code>[data-testid="submit"]</code></td></tr>
+                  <tr><td>3</td><td>ARIA role</td><td><code>[role="navigation"]</code></td></tr>
+                  <tr><td>4</td><td>Semantic attributes</td><td><code>input[name="email"]</code></td></tr>
+                  <tr><td>5</td><td>CSS classes</td><td><code>button.primary</code></td></tr>
+                  <tr><td>6</td><td>Landmark tags</td><td><code>nav</code>, <code>header</code></td></tr>
+                  <tr><td>7</td><td>Ancestor traversal</td><td><code>#form button.submit</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="api-entry">
+            <h3><code>resetSelectorCache(): void</code></h3>
+            <p>No-op reset function included for API consistency. The selector module is stateless.</p>
           </div>
         </div>
 

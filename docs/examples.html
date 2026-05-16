@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Examples &amp; Migration Guide - react-unique-id-generator | Forms, ARIA, SSR, Testing</title>
-  <meta name="description" content="Real-world examples and migration guide for react-unique-id-generator. Learn how to use useUniqueId for accessible forms, ARIA attributes, SSR with Next.js, test automation with data-testid, custom strategies, collision detection, ID pools, and custom delimiters." />
-  <meta name="keywords" content="react id examples, react form accessibility, react ARIA id, react SSR id example, react data-testid, react id migration, useUniqueId example, IdProvider example, react id Next.js, react id Remix" />
+  <meta name="description" content="Real-world examples and migration guide for react-unique-id-generator. Learn how to use useUniqueId for accessible forms, ARIA attributes, SSR with Next.js, test automation with data-testid, stable CSS selectors, custom strategies, collision detection, ID pools, and custom delimiters." />
+  <meta name="keywords" content="react id examples, react form accessibility, react ARIA id, react SSR id example, react data-testid, react id migration, useUniqueId example, IdProvider example, react id Next.js, react id Remix, css selector example, useStableSelector example, generateSelector example" />
   <meta name="author" content="Riyajath Ahamed" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/examples.html" />
@@ -366,6 +366,69 @@ detector.<span class="fn">register</span>(<span class="str">'nav-1'</span>);   <
   <span class="cm">// "nav.1.link"</span>
   <span class="kw">return</span> &lt;<span class="tag">a</span> <span class="attr">id</span>={id}&gt;...&lt;/<span class="tag">a</span>&gt;;
 }</code></pre>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== v2.3 Examples ========== -->
+  <section class="section" id="v23-examples">
+    <div class="container">
+      <h2 class="section-title">v2.3 Examples</h2>
+      <p class="section-subtitle">Stable CSS selector generation for analytics, testing, and session replay</p>
+      <div class="example-grid">
+
+        <div class="example-card">
+          <h3>Analytics Click Tracking</h3>
+          <p>Generate stable selectors for analytics events without manual <code>data-*</code> attributes.</p>
+          <pre><code><span class="kw">import</span> { useRef } <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> { <span class="fn">useStableSelector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">function</span> <span class="fn">TrackedButton</span>({ label }) {
+  <span class="kw">const</span> ref = <span class="fn">useRef</span>(<span class="kw">null</span>);
+  <span class="kw">const</span> selector = <span class="fn">useStableSelector</span>(ref);
+
+  <span class="kw">return</span> (
+    &lt;<span class="tag">button</span> <span class="attr">ref</span>={ref}
+      <span class="attr">onClick</span>={() =&gt;
+        analytics.<span class="fn">track</span>(<span class="str">'click'</span>, { selector })
+      }&gt;
+      {label}
+    &lt;/<span class="tag">button</span>&gt;
+  );
+}</code></pre>
+        </div>
+
+        <div class="example-card">
+          <h3>Global Click Listener</h3>
+          <p>Capture selectors for any clicked element, filtering out CSS-in-JS noise.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">generateSelector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+document.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, (e) =&gt; {
+  <span class="kw">const</span> target = e.target;
+  <span class="kw">const</span> selector = <span class="fn">generateSelector</span>(target, {
+    ignoreClassPattern: <span class="str">/^css-|^sc-/</span>,
+    maxDepth: <span class="num">3</span>,
+  });
+
+  console.<span class="fn">log</span>(<span class="str">'Clicked:'</span>, selector);
+  <span class="cm">// e.g. "#nav button.menu-toggle"</span>
+});</code></pre>
+        </div>
+
+        <div class="example-card">
+          <h3>Scoped Selectors</h3>
+          <p>Generate selectors scoped to a specific container element.</p>
+          <pre><code><span class="kw">import</span> { <span class="fn">generateSelector</span> } <span class="kw">from</span> <span class="str">'react-unique-id-generator'</span>;
+
+<span class="kw">const</span> modal = document.<span class="fn">getElementById</span>(<span class="str">'modal'</span>);
+<span class="kw">const</span> btn = modal.<span class="fn">querySelector</span>(<span class="str">'button'</span>);
+
+<span class="kw">const</span> selector = <span class="fn">generateSelector</span>(btn, {
+  root: modal,
+});
+<span class="cm">// Unique within the modal, not the whole page</span></code></pre>
         </div>
 
       </div>
