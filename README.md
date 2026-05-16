@@ -25,6 +25,7 @@
   <a href="#collision-detection">Collision Detection</a> &bull;
   <a href="#id-pool-management">Pools</a> &bull;
   <a href="#custom-delimiters">Delimiters</a> &bull;
+  <a href="#stable-css-selectors">Selectors</a> &bull;
   <a href="#migration-guide-v1x-to-v20">Migration</a>
 </p>
 
@@ -106,6 +107,7 @@ nextId(); // "app-1"
 |  COLLISION DETECTION        ======== Yes    |
 |  ID POOL MANAGEMENT         ======== Yes    |
 |  CUSTOM DELIMITERS          ======== Yes    |
+|  STABLE CSS SELECTORS       ======== Yes    |
 |  TEST COVERAGE              ======== 100%   |
 |  BUNDLE SIZE                ======== Tiny   |
 +---------------------------------------------+
@@ -124,6 +126,7 @@ nextId(); // "app-1"
 | Collision detection | Yes (v2.2) | No |
 | ID pool management | Yes (v2.2) | No |
 | Custom delimiters | Yes (v2.2) | No |
+| Stable CSS selectors | Yes (v2.3) | No |
 | SSR request-scoped provider | Yes (v2.2) | No |
 | Counter reset | Yes | No |
 | Works in React 16+ | Yes | React 18+ only |
@@ -139,6 +142,7 @@ nextId(); // "app-1"
 - **Collision detection** - Track generated IDs and detect duplicates with configurable warn/throw/skip actions
 - **ID pools** - Pre-allocate IDs for high-throughput scenarios with acquire/release semantics
 - **Custom delimiters** - Join prefix, counter, and suffix with any delimiter (`.`, `::`, `__`, etc.)
+- **Stable CSS selectors** - Generate unique, human-readable CSS selectors for DOM elements using IDs, data attributes, ARIA roles, and semantic attributes
 - **Automation-ready** - Generate deterministic `data-testid` values with multiple naming strategies
 - **Lightweight** - Minified bundles with zero runtime dependencies
 - **Flexible** - Global and local prefix/suffix support for fine-grained ID control
@@ -907,6 +911,80 @@ Resets the delimiter counter to 0. Useful in test setup.
 
 ---
 
+### Stable CSS Selectors
+
+Generate unique, human-readable CSS selectors for DOM elements. Useful for analytics tracking, session replay tagging, automated testing, and any scenario where you need a stable way to reference an element.
+
+The selector generator tries strategies in priority order until it finds a unique match:
+
+1. **Stable ID** — `#my-element` (skips dynamic IDs matching `/^[:.]|^\d/` by default)
+2. **Data attributes** — `[data-testid="submit-btn"]` (checks `data-testid`, `data-test-id`, `data-cy`)
+3. **ARIA role** — `[role="navigation"]` or `[role="button"][aria-label="Close"]`
+4. **Semantic attributes** — `input[name="email"]`, `a[href="/home"]`, `label[for="name"]`
+5. **CSS classes** — `button.primary`, `div.card.active` (single or paired)
+6. **Landmark tags** — `header`, `nav`, `main`, `footer`
+7. **Ancestor traversal** — Combines ancestor selectors with the target (up to `maxDepth`, default 5)
+
+#### `generateSelector(element, options?): string`
+
+Generate a unique CSS selector for a DOM element.
+
+```ts
+import { generateSelector } from 'react-unique-id-generator';
+
+const button = document.querySelector('button.submit');
+const selector = generateSelector(button);
+// e.g. "button.submit" or "#form-container button.submit"
+```
+
+**Options (`SelectorOptions`):**
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `root` | `Element` | `document` | Scope uniqueness checks to a subtree |
+| `dataAttributes` | `string[]` | `['data-testid', 'data-test-id', 'data-cy']` | Data attributes to check (in priority order) |
+| `maxDepth` | `number` | `5` | Maximum ancestor levels to traverse for combined selectors |
+| `ignoreIdPattern` | `RegExp` | `/^[:.]|^\d/` | IDs matching this pattern are treated as dynamic and skipped |
+| `ignoreClassPattern` | `RegExp` | - | Classes matching this pattern are excluded from selectors |
+
+**Custom options example:**
+
+```ts
+generateSelector(element, {
+  dataAttributes: ['data-qa', 'data-automation-id'],
+  maxDepth: 3,
+  ignoreClassPattern: /^css-|^sc-/,  // Ignore CSS-in-JS generated classes
+});
+```
+
+#### `useStableSelector(ref, options?): string | null`
+
+React hook that generates a stable CSS selector for a ref'd element. The selector is computed once on mount and remains stable across re-renders.
+
+```tsx
+import { useRef } from 'react';
+import { useStableSelector } from 'react-unique-id-generator';
+
+function TrackedButton() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const selector = useStableSelector(ref);
+
+  return (
+    <button ref={ref} onClick={() => analytics.track('click', { selector })}>
+      Click me
+    </button>
+  );
+}
+```
+
+Returns `null` until the ref is attached (i.e., before mount).
+
+#### `resetSelectorCache(): void`
+
+Reset function included for API consistency. The selector module is stateless (no module-level cache), so this is a no-op.
+
+---
+
 ### Legacy Functions
 
 > These functions use global state and are still fully functional. In v2.0, they emit a one-time deprecation warning in development mode, recommending migration to `<IdProvider>` for SSR safety.
@@ -1220,6 +1298,43 @@ function Page() {
 }
 ```
 
+### Stable CSS Selectors for Analytics
+
+```tsx
+import { useRef } from 'react';
+import { useStableSelector } from 'react-unique-id-generator';
+
+function TrackedSection({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLElement>(null);
+  const selector = useStableSelector(ref);
+
+  const handleClick = () => {
+    analytics.track('section_click', { selector });
+  };
+
+  return (
+    <section ref={ref} onClick={handleClick}>
+      {children}
+    </section>
+  );
+}
+```
+
+### Generating Selectors Outside React
+
+```ts
+import { generateSelector } from 'react-unique-id-generator';
+
+document.addEventListener('click', (e) => {
+  const target = e.target as Element;
+  const selector = generateSelector(target, {
+    ignoreClassPattern: /^css-/,  // Skip CSS-in-JS classes
+    maxDepth: 3,
+  });
+  console.log('Clicked:', selector);
+});
+```
+
 ### Dot-Delimited Namespace IDs
 
 ```tsx
@@ -1403,6 +1518,11 @@ import {
   createSSRIdFactory,
   generateDelimitedId,
   useDelimitedId,
+
+  // v2.3.0
+  generateSelector,
+  useStableSelector,
+  resetSelectorCache,
 } from 'react-unique-id-generator';
 
 import type {
@@ -1421,6 +1541,9 @@ import type {
   SSRContextValue,
   SSRProviderProps,
   DelimitedIdOptions,
+
+  // v2.3.0
+  SelectorOptions,
 } from 'react-unique-id-generator';
 ```
 
@@ -1482,6 +1605,16 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 ## Changelog
+
+### v2.3.0
+
+**New Features:**
+
+- **New**: `generateSelector()` - Generate unique, human-readable CSS selectors for DOM elements using a priority chain (ID > data attributes > ARIA roles > semantic attributes > classes > landmarks) with ancestor traversal fallback
+- **New**: `useStableSelector()` - React hook that computes a stable CSS selector for a ref'd element once on mount
+- **New**: `resetSelectorCache()` - Reset function for API consistency
+- **New**: `SelectorOptions` type - Configure `root`, `dataAttributes`, `maxDepth`, `ignoreIdPattern`, and `ignoreClassPattern`
+- **Backward Compatible**: All existing APIs remain unchanged
 
 ### v2.2.0
 
