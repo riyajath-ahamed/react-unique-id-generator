@@ -1,7 +1,7 @@
 {
   "name": "react-unique-id-generator",
-  "version": "2.2.1",
-  "description": "A lightweight, zero-dependency library for generating unique, sequential IDs in React — with hooks, custom prefix/suffix, and SSR support",
+  "version": "2.3.0",
+  "description": "A lightweight, zero-dependency library for generating unique, sequential IDs in React — with hooks, custom prefix/suffix, SSR support, and stable CSS selector generation",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
@@ -47,7 +47,10 @@
     "test-automation-id",
     "typescript",
     "react-context",
-    "sequential-id"
+    "sequential-id",
+    "css-selector",
+    "stable-selector",
+    "dom-selector"
   ],
   "author": "riyajath-ahamed <riyajath.ahamed@gmail.com> (https://github.com/riyajath-ahamed)",
   "license": "MIT",

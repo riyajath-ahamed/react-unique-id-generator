@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>react-unique-id-generator - Lightweight Unique ID Generation for React | SSR-Safe, Zero Dependencies</title>
   <meta name="description" content="Generate unique, readable, and SSR-safe IDs in React applications. Zero dependencies, custom strategies, collision detection, ID pools, TypeScript support. The best useId alternative for React 16+." />
-  <meta name="keywords" content="react unique id, react id generator, useId alternative, react hooks id, SSR safe id, react accessibility id, aria id generator, react form id, data-testid generator, typescript react id, react sequential id, react custom id strategy, react collision detection, id pool react, react useUniqueId, nextId react, react component id, unique identifier react, react label id, react input id" />
+  <meta name="keywords" content="react unique id, react id generator, useId alternative, react hooks id, SSR safe id, react accessibility id, aria id generator, react form id, data-testid generator, typescript react id, react sequential id, react custom id strategy, react collision detection, id pool react, react useUniqueId, nextId react, react component id, unique identifier react, react label id, react input id, css selector generator, stable css selector, dom element selector" />
   <meta name="author" content="Riyajath Ahamed" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://riyajath-ahamed.github.io/react-unique-id-generator/" />
@@ -166,13 +166,13 @@
   <main>
   <section class="hero">
     <div class="container">
-      <div class="hero-badge">v2.2</div>
+      <div class="hero-badge">v2.3</div>
       <p align="center">
         <img src="favicon.ico" width="60" />
         <h1 class="hero-title">react-unique-id-generator</h1>
       </p>
       <p class="hero-subtitle">Readable. Predictable. SSR-safe.</p>
-      <p class="hero-desc">Zero-dependency unique ID generation for React. Custom strategies, collision detection, ID pools, SSR isolation, performance monitoring, and automation test IDs.</p>
+      <p class="hero-desc">Zero-dependency unique ID generation for React. Custom strategies, collision detection, ID pools, SSR isolation, stable CSS selectors, performance monitoring, and automation test IDs.</p>
       <div class="hero-actions">
         <a href="#quick-start" class="btn btn-primary">Get Started</a>
         <div class="hero-install">
@@ -205,9 +205,16 @@
 
   <section class="section section-alt" id="whats-new">
     <div class="container">
-      <h2 class="section-title">What's New in v2.2</h2>
-      <p class="section-subtitle">Custom strategies, collision detection, ID pools, SSR provider, and custom delimiters. Fully backward compatible.</p>
+      <h2 class="section-title">What's New in v2.3</h2>
+      <p class="section-subtitle">Stable CSS selector generation for DOM elements, plus all v2.2 features. Fully backward compatible.</p>
       <div class="whats-new-grid">
+        <div class="whats-new-card">
+          <div class="whats-new-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </div>
+          <h3>Stable CSS Selectors</h3>
+          <p><code>generateSelector</code> and <code>useStableSelector</code> build unique, human-readable CSS selectors for any DOM element using IDs, data attributes, ARIA roles, and more.</p>
+        </div>
         <div class="whats-new-card">
           <div class="whats-new-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -311,6 +318,13 @@
         </div>
         <div class="feature-card">
           <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </div>
+          <h3>CSS Selectors</h3>
+          <p>Generate unique, stable CSS selectors for DOM elements. Ideal for analytics, session replay, and test automation.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           </div>
           <h3>Automation-Ready</h3>
@@ -362,6 +376,7 @@
             <tr><td>Collision detection</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>ID pool management</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>Custom delimiters</td><td class="yes">Yes</td><td class="no">No</td></tr>
+            <tr><td>Stable CSS selectors</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>SSR request-scoped provider</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>Automation test IDs</td><td class="yes">Yes</td><td class="no">No</td></tr>
             <tr><td>Server ID manager</td><td class="yes">Yes</td><td class="no">No</td></tr>

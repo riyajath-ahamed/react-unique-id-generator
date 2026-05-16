@@ -37,6 +37,7 @@ All source lives in `lib/`:
 - `lib/pool.ts` — Generic ID pool management: `IdPool` class with acquire/release/drain/refill, custom generators, auto-refill. `useIdPool` React hook.
 - `lib/ssr.ts` — SSR-specific utilities: `SSRProvider` component with `requestId` for per-request isolation, `useSSRSafeId` hook, `createSSRIdFactory` for non-React SSR.
 - `lib/delimiter.ts` — Custom delimiter support: `generateDelimitedId` and `useDelimitedId` for joining prefix/counter/suffix with arbitrary delimiters.
+- `lib/selector.ts` — Stable CSS selector generation: `generateSelector` builds a unique CSS selector for a DOM element using a priority chain (ID > data attributes > ARIA roles > semantic attributes > classes > landmarks), with ancestor traversal fallback. `useStableSelector` hook computes once on mount. `resetSelectorCache` for API consistency.
 - `lib/index.ts` — Re-exports everything. This is the build entry point.
 
 ### Build Output
@@ -70,6 +71,7 @@ Tests live in `tests/`. Framework: **Jest** with **ts-jest** and **jsdom** envir
 - `tests/pool.test.tsx` — IdPool class, `useIdPool` hook, auto-refill, custom generators
 - `tests/ssr.test.tsx` — SSRProvider, `useSSRSafeId`, `createSSRIdFactory`, request isolation
 - `tests/delimiter.test.tsx` — `generateDelimitedId`, `useDelimitedId`, custom delimiter patterns
+- `tests/selector.test.tsx` — `generateSelector`, `useStableSelector`, CSS escaping, priority chain, ancestor traversal, `SelectorOptions`
 - `tests/setup.ts` — Jest setup (imports `@testing-library/jest-dom`)
 - `tests/types.d.ts` — Test type declarations
 
@@ -100,6 +102,8 @@ GitHub Actions workflows in `.github/workflows/`:
 - **`IdPool`** is a generic pool (distinct from `AutomationIdPool` which is automation-specific). Supports custom generators, auto-refill, and acquire/release semantics.
 - **`SSRProvider`** is a React context provider that accepts a `requestId` prop to namespace IDs per server request. `createSSRIdFactory` is the non-React equivalent for plain server code.
 - **`generateDelimitedId`** joins prefix, counter, and suffix with an arbitrary delimiter (default `"-"`). Parts are only included if non-empty.
+- **`generateSelector`** builds a unique CSS selector for a DOM element using a priority chain: stable ID > data-testid/data-test-id/data-cy > ARIA role > semantic attributes > class combinations > landmark tags. Falls back to ancestor traversal (up to `maxDepth`, default 5) when no single-element selector is unique. `SelectorOptions` allows custom `root`, `dataAttributes`, `maxDepth`, `ignoreIdPattern`, and `ignoreClassPattern`.
+- **`useStableSelector`** computes the selector once on mount via a `useRef` guard, avoiding recomputation on re-renders.
 
 ## Code Style
 

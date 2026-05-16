@@ -15,6 +15,7 @@ A lightweight, zero-dependency library for generating unique, sequential IDs in 
 - ID pool management with acquire/release semantics for high-throughput scenarios
 - Custom delimiters between ID parts (`.`, `::`, `__`, `/`, etc.)
 - SSR request-scoped provider with `requestId` namespacing
+- Stable CSS selector generation for DOM elements (analytics, session replay, test automation)
 - Automation test ID generation with naming strategies
 - Cryptographically secure random IDs via `generateSecureId()`
 - Scoped ID resets per feature/module
@@ -89,6 +90,13 @@ function Form() {
 - `generateDelimitedId(options?)` - Join prefix/counter/suffix with custom delimiter
 - `useDelimitedId(prefix?, delimiter?, suffix?)` - Hook version, stable across re-renders
 - `resetDelimiterCounter()` - Reset the delimiter counter to 0
+
+## v2.3 API
+
+- `generateSelector(element, options?)` - Generate a unique CSS selector for a DOM element using a priority chain: ID > data attributes > ARIA roles > semantic attributes > classes > landmarks, with ancestor traversal fallback
+- `useStableSelector(ref, options?)` - React hook that computes a stable CSS selector for a ref'd element once on mount
+- `resetSelectorCache()` - No-op reset function for API consistency (selector module is stateless)
+- `SelectorOptions` - Configure `root` (scope), `dataAttributes`, `maxDepth` (default 5), `ignoreIdPattern`, `ignoreClassPattern`
 
 ## v2.1 API
 
