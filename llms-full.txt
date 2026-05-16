@@ -2,7 +2,7 @@
 
 > Unique IDs for React. Readable. Predictable. SSR-safe.
 
-Version: 2.2.0
+Version: 2.3.0
 License: MIT
 Peer dependency: react >=16.8.0
 Zero runtime dependencies.
@@ -65,6 +65,11 @@ import {
   useDelimitedId,
   resetDelimiterCounter,
   getDelimiterCounter,
+
+  // v2.3 additions
+  generateSelector,
+  useStableSelector,
+  resetSelectorCache,
 } from 'react-unique-id-generator';
 
 // Legacy (deprecated, still functional):
@@ -98,6 +103,9 @@ import type {
   SSRContextValue,
   SSRProviderProps,
   DelimitedIdOptions,
+
+  // v2.3 additions
+  SelectorOptions,
 } from 'react-unique-id-generator';
 ```
 
@@ -744,6 +752,68 @@ Get the current delimiter counter value.
 
 ---
 
+## Stable CSS Selectors (v2.3)
+
+Generate unique, human-readable CSS selectors for DOM elements. Useful for analytics tracking,
+session replay tagging, automated testing, and any scenario where you need a stable reference to an element.
+
+The selector generator tries strategies in priority order until it finds a unique match:
+1. Stable ID (`#my-element`, skips dynamic IDs matching `/^[:.]|^\d/` by default)
+2. Data attributes (`[data-testid="submit-btn"]`, checks `data-testid`, `data-test-id`, `data-cy`)
+3. ARIA role (`[role="navigation"]` or `[role="button"][aria-label="Close"]`)
+4. Semantic attributes (`input[name="email"]`, `a[href="/home"]`, `label[for="name"]`)
+5. CSS classes (`button.primary`, `div.card.active`, single or paired)
+6. Landmark tags (`header`, `nav`, `main`, `footer`)
+7. Ancestor traversal — combines ancestor selectors with the target (up to `maxDepth`)
+
+### `generateSelector(element: Element, options?: SelectorOptions): string`
+
+Generate a unique CSS selector for a DOM element.
+
+Options (`SelectorOptions`):
+- `root?: Element` (default: `document`) - Scope uniqueness checks to a subtree
+- `dataAttributes?: string[]` (default: `['data-testid', 'data-test-id', 'data-cy']`) - Data attributes to check
+- `maxDepth?: number` (default: `5`) - Maximum ancestor levels to traverse
+- `ignoreIdPattern?: RegExp` (default: `/^[:.]|^\d/`) - IDs matching this are treated as dynamic and skipped
+- `ignoreClassPattern?: RegExp` - Classes matching this are excluded from selectors
+
+```ts
+const button = document.querySelector('button.submit');
+const selector = generateSelector(button);
+// e.g. "button.submit" or "#form-container button.submit"
+
+// Custom options
+generateSelector(element, {
+  dataAttributes: ['data-qa', 'data-automation-id'],
+  maxDepth: 3,
+  ignoreClassPattern: /^css-|^sc-/,  // Ignore CSS-in-JS generated classes
+});
+```
+
+### `useStableSelector(ref: RefObject<Element | null>, options?: SelectorOptions): string | null`
+
+React hook that generates a stable CSS selector for a ref'd element. Computed once on mount,
+stable across re-renders. Returns `null` until the ref is attached.
+
+```tsx
+function TrackedButton() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const selector = useStableSelector(ref);
+
+  return (
+    <button ref={ref} onClick={() => analytics.track('click', { selector })}>
+      Click me
+    </button>
+  );
+}
+```
+
+### `resetSelectorCache(): void`
+
+No-op reset function included for API consistency. The selector module is stateless.
+
+---
+
 ## Legacy Functions (Deprecated)
 
 These use global state. They emit a one-time deprecation warning in development.
@@ -986,6 +1056,43 @@ function Page() {
     </div>
   );
 }
+```
+
+### Stable CSS selectors for analytics
+
+```tsx
+import { useRef } from 'react';
+import { useStableSelector } from 'react-unique-id-generator';
+
+function TrackedSection({ children }) {
+  const ref = useRef<HTMLElement>(null);
+  const selector = useStableSelector(ref);
+
+  const handleClick = () => {
+    analytics.track('section_click', { selector });
+  };
+
+  return (
+    <section ref={ref} onClick={handleClick}>
+      {children}
+    </section>
+  );
+}
+```
+
+### Generating selectors outside React
+
+```ts
+import { generateSelector } from 'react-unique-id-generator';
+
+document.addEventListener('click', (e) => {
+  const target = e.target as Element;
+  const selector = generateSelector(target, {
+    ignoreClassPattern: /^css-/,
+    maxDepth: 3,
+  });
+  console.log('Clicked:', selector);
+});
 ```
 
 ### Dot-delimited namespace IDs
