@@ -1,189 +1,34 @@
-import nextId, {
-  resetId,
-  setGlobalPrefix,
-  setGlobalSuffix,
-  getCurrentId,
-  setId,
-  generateId,
-  OVERFLOW_THRESHOLD
-} from "./nextId";
-
-import { useUniqueId, useUniqueIds } from "./hooks";
-
-import { IdProvider, IdContext, useIdContext } from "./context";
-import type { IdProviderProps, IdContextValue } from "./context";
-
-import { createServerIdManager } from "./server";
-import type { ServerIdManager, ServerIdManagerOptions } from "./server";
-
-import {
-  generateAutomationId,
-  useAutomationId,
-  resetAutomationCounter,
-  AutomationIdPool,
-} from "./automation";
-import type { AutomationIdStrategy, AutomationIdOptions } from "./automation";
-
-import { generateSecureId } from "./secure";
-
-import {
-  nextIdForScope,
-  resetIdForScope,
-  resetAllScopes,
-  getScopeCounter,
-  getActiveScopes,
-} from "./scope";
-
-import {
-  useTrackedUniqueId,
-  useTrackedUniqueIds,
-  useIdMetrics,
-  getIdMetrics,
-  resetIdMetrics,
-  getActiveIdCount,
-  cleanupInactiveIds,
-} from "./performance";
-import type { IdMetrics } from "./performance";
-
-import {
-  generateIdWithStrategy,
-  useIdWithStrategy,
-  numericStrategy,
-  zeroPaddedStrategy,
-  timestampStrategy,
-  hashStrategy,
-  resetStrategyCounter,
-  getStrategyCounter,
-} from "./strategy";
-import type { IdStrategy } from "./strategy";
-
-import {
-  CollisionDetector,
-  getGlobalCollisionDetector,
-  resetGlobalCollisionDetector,
-  checkCollision,
-} from "./collision";
-import type { CollisionAction, CollisionDetectorOptions } from "./collision";
-
-import { IdPool, useIdPool } from "./pool";
-import type { IdPoolOptions } from "./pool";
-
-import {
-  SSRProvider,
-  SSRContext,
-  useSSRContext,
-  useSSRSafeId,
-  createSSRIdFactory,
-} from "./ssr";
-import type { SSRContextValue, SSRProviderProps } from "./ssr";
-
-import {
-  generateDelimitedId,
-  useDelimitedId,
-  resetDelimiterCounter,
-  getDelimiterCounter,
-} from "./delimiter";
-import type { DelimitedIdOptions } from "./delimiter";
-
-import {
-  generateSelector,
-  useStableSelector,
-  resetSelectorCache,
-} from "./selector";
-import type { SelectorOptions } from "./selector";
-
-export {
-  nextId as default,
-  resetId,
-  setGlobalPrefix,
-  setGlobalSuffix,
-  getCurrentId,
-  setId,
-  generateId,
-  OVERFLOW_THRESHOLD,
-  useUniqueId,
-  useUniqueIds,
-
-  IdProvider,
-  IdContext,
-  useIdContext,
-
-  createServerIdManager,
-
-  generateAutomationId,
-  useAutomationId,
-  resetAutomationCounter,
-  AutomationIdPool,
-
-  generateSecureId,
-
-  nextIdForScope,
-  resetIdForScope,
-  resetAllScopes,
-  getScopeCounter,
-  getActiveScopes,
-
-  useTrackedUniqueId,
-  useTrackedUniqueIds,
-  useIdMetrics,
-  getIdMetrics,
-  resetIdMetrics,
-  getActiveIdCount,
-  cleanupInactiveIds,
-
-  // v2.2.0: Custom ID strategies
-  generateIdWithStrategy,
-  useIdWithStrategy,
-  numericStrategy,
-  zeroPaddedStrategy,
-  timestampStrategy,
-  hashStrategy,
-  resetStrategyCounter,
-  getStrategyCounter,
-
-  // v2.2.0: Collision detection
-  CollisionDetector,
-  getGlobalCollisionDetector,
-  resetGlobalCollisionDetector,
-  checkCollision,
-
-  // v2.2.0: ID pool management
-  IdPool,
-  useIdPool,
-
-  // v2.2.0: SSR utilities
-  SSRProvider,
-  SSRContext,
-  useSSRContext,
-  useSSRSafeId,
-  createSSRIdFactory,
-
-  // v2.2.0: Custom delimiter support
-  generateDelimitedId,
-  useDelimitedId,
-  resetDelimiterCounter,
-  getDelimiterCounter,
-
-  // v2.3.0: Stable CSS selector generation
-  generateSelector,
-  useStableSelector,
-  resetSelectorCache,
-};
-
+export { IdManager, createIdManager } from './core/id-manager';
+export { OVERFLOW_THRESHOLD } from './core/overflow';
 export type {
-  IdProviderProps,
-  IdContextValue,
-  ServerIdManager,
-  ServerIdManagerOptions,
+  IdManagerOptions,
+  IdStrategy,
   AutomationIdStrategy,
   AutomationIdOptions,
-  IdMetrics,
-  IdStrategy,
   CollisionAction,
   CollisionDetectorOptions,
-  IdPoolOptions,
-  SSRContextValue,
-  SSRProviderProps,
-  DelimitedIdOptions,
   SelectorOptions,
-};
+} from './core/types';
+
+export { generateAutomationId } from './automation';
+export { AutomationIdPool } from './automation-pool';
+export { generateSelector } from './selector';
+export {
+  CollisionDetector,
+  getGlobalCollisionDetector,
+  resetGlobalCollisionDetector,
+  checkCollision,
+} from './collision';
+export {
+  numericStrategy,
+  zeroPaddedStrategy,
+  timestampStrategy,
+  hashStrategy,
+  generateIdWithStrategy,
+} from './strategy';
+
+export { IdManagerProvider, useIdManager } from './react/context';
+export type { IdManagerProviderProps } from './react/context';
+export { useAutomationId } from './react/use-automation-id';
+export { useStableSelector } from './react/use-stable-selector';
+export { useIdWithStrategy } from './react/use-id-with-strategy';

@@ -1,11 +1,5 @@
-const isDev = typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
-
-export type CollisionAction = 'warn' | 'throw' | 'skip';
-
-export interface CollisionDetectorOptions {
-  action?: CollisionAction;
-  maxSize?: number;
-}
+import { isDev } from './core/overflow';
+import type { CollisionAction, CollisionDetectorOptions } from './core/types';
 
 export class CollisionDetector {
   private registry = new Set<string>();
@@ -92,3 +86,5 @@ export function checkCollision(id: string, action: CollisionAction = 'warn'): bo
   const detector = getGlobalCollisionDetector({ action });
   return detector.register(id);
 }
+
+export type { CollisionAction, CollisionDetectorOptions } from './core/types';

@@ -1,14 +1,4 @@
-import { useState, useEffect, useRef as useReactRef } from 'react';
-
-export interface SelectorOptions {
-  root?: Element;
-  dataAttributes?: string[];
-  maxDepth?: number;
-  ignoreIdPattern?: RegExp;
-  ignoreClassPattern?: RegExp;
-}
-
-type RefObject<T> = { readonly current: T | null };
+import type { SelectorOptions } from './core/types';
 
 const DEFAULT_DATA_ATTRIBUTES = ['data-testid', 'data-test-id', 'data-cy'];
 const DEFAULT_IGNORE_ID_PATTERN = /^[:.]|^\d/;
@@ -233,23 +223,4 @@ export function generateSelector(
   return chain.join(' ');
 }
 
-export function useStableSelector(
-  ref: RefObject<Element | null>,
-  options: SelectorOptions = {},
-): string | null {
-  const [selector, setSelector] = useState<string | null>(null);
-  const computedRef = useReactRef(false);
-
-  useEffect(() => {
-    if (ref.current && !computedRef.current) {
-      computedRef.current = true;
-      setSelector(generateSelector(ref.current, options));
-    }
-  });
-
-  return selector;
-}
-
-export function resetSelectorCache(): void {
-  // No module-level state to reset — included for API consistency.
-}
+export type { SelectorOptions } from './core/types';
