@@ -12,9 +12,10 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "isolatedModules": true
   },
   "include": ["lib/**/*"],
   "exclude": ["node_modules", "example", "dist", "**/*.test.ts", "**/*.spec.ts"]
