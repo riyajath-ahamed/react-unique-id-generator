@@ -2,22 +2,21 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import {
   generateIdWithStrategy,
-  useIdWithStrategy,
   numericStrategy,
   zeroPaddedStrategy,
   timestampStrategy,
   hashStrategy,
-  resetStrategyCounter,
-  getStrategyCounter,
 } from '../lib/strategy';
-import type { IdStrategy } from '../lib/strategy';
-import { IdProvider } from '../lib/context';
+import type { IdStrategy } from '../lib/core/types';
+import { useIdWithStrategy, _resetFallbackManager } from '../lib/react/use-id-with-strategy';
+import { IdManagerProvider } from '../lib/react/context';
+import { IdManager, createIdManager } from '../lib/core/id-manager';
+
+afterEach(() => {
+  _resetFallbackManager();
+});
 
 describe('numericStrategy', () => {
-  beforeEach(() => {
-    resetStrategyCounter();
-  });
-
   test('should generate numeric IDs', () => {
     expect(numericStrategy.generate('btn-', '', 1)).toBe('btn-1');
     expect(numericStrategy.generate('', '-end', 5)).toBe('5-end');
@@ -26,10 +25,6 @@ describe('numericStrategy', () => {
 });
 
 describe('zeroPaddedStrategy', () => {
-  beforeEach(() => {
-    resetStrategyCounter();
-  });
-
   test('should generate zero-padded IDs with default width', () => {
     const strategy = zeroPaddedStrategy();
     expect(strategy.generate('id-', '', 1)).toBe('id-0001');
@@ -50,10 +45,6 @@ describe('zeroPaddedStrategy', () => {
 });
 
 describe('timestampStrategy', () => {
-  beforeEach(() => {
-    resetStrategyCounter();
-  });
-
   test('should include timestamp and counter', () => {
     const before = Date.now();
     const result = timestampStrategy.generate('ts-', '', 1);
@@ -67,10 +58,6 @@ describe('timestampStrategy', () => {
 });
 
 describe('hashStrategy', () => {
-  beforeEach(() => {
-    resetStrategyCounter();
-  });
-
   test('should generate hex hash IDs', () => {
     const result = hashStrategy.generate('h-', '', 1);
     expect(result).toMatch(/^h-[0-9a-f]{8}$/);
@@ -90,19 +77,21 @@ describe('hashStrategy', () => {
 });
 
 describe('generateIdWithStrategy', () => {
+  let manager: IdManager;
+
   beforeEach(() => {
-    resetStrategyCounter();
+    manager = createIdManager();
   });
 
   test('should use the given strategy', () => {
-    const result = generateIdWithStrategy(numericStrategy, 'item-', '-v1');
+    const result = generateIdWithStrategy(manager, numericStrategy, 'item-', '-v1');
     expect(result).toBe('item-1-v1');
   });
 
   test('should increment the strategy counter', () => {
-    generateIdWithStrategy(numericStrategy);
-    generateIdWithStrategy(numericStrategy);
-    expect(getStrategyCounter()).toBe(2);
+    generateIdWithStrategy(manager, numericStrategy);
+    generateIdWithStrategy(manager, numericStrategy);
+    expect(manager.getStrategyCounter()).toBe(2);
   });
 
   test('should work with custom strategies', () => {
@@ -111,31 +100,43 @@ describe('generateIdWithStrategy', () => {
         return `${prefix}CUSTOM${counter}${suffix}`;
       },
     };
-    expect(generateIdWithStrategy(custom, 'x-', '!')).toBe('x-CUSTOM1!');
-    expect(generateIdWithStrategy(custom, '', '')).toBe('CUSTOM2');
+    expect(generateIdWithStrategy(manager, custom, 'x-', '!')).toBe('x-CUSTOM1!');
+    expect(generateIdWithStrategy(manager, custom, '', '')).toBe('CUSTOM2');
   });
 
   test('should default prefix and suffix to empty strings', () => {
-    expect(generateIdWithStrategy(numericStrategy)).toBe('1');
+    expect(generateIdWithStrategy(manager, numericStrategy)).toBe('1');
+  });
+
+  test('should use separate counters per manager', () => {
+    const m1 = createIdManager();
+    const m2 = createIdManager();
+    expect(generateIdWithStrategy(m1, numericStrategy)).toBe('1');
+    expect(generateIdWithStrategy(m2, numericStrategy)).toBe('1');
+    expect(generateIdWithStrategy(m1, numericStrategy)).toBe('2');
   });
 });
 
 describe('useIdWithStrategy', () => {
-  beforeEach(() => {
-    resetStrategyCounter();
-  });
-
   test('should generate a stable ID with a strategy', () => {
     const Component: React.FC<{ value: number }> = ({ value }) => {
       const id = useIdWithStrategy(numericStrategy, 'field-');
       return <input id={id} value={value} readOnly />;
     };
 
-    const { container, rerender } = render(<Component value={1} />);
+    const { container, rerender } = render(
+      <IdManagerProvider>
+        <Component value={1} />
+      </IdManagerProvider>
+    );
     const input = container.querySelector('input')!;
     expect(input.id).toBe('field-1');
 
-    rerender(<Component value={2} />);
+    rerender(
+      <IdManagerProvider>
+        <Component value={2} />
+      </IdManagerProvider>
+    );
     expect(container.querySelector('input')!.id).toBe('field-1');
   });
 
@@ -150,10 +151,10 @@ describe('useIdWithStrategy', () => {
     };
 
     const { getByTestId } = render(
-      <div>
+      <IdManagerProvider>
         <ComponentA />
         <ComponentB />
-      </div>
+      </IdManagerProvider>
     );
 
     expect(getByTestId('a-1')).toBeInTheDocument();
@@ -166,36 +167,52 @@ describe('useIdWithStrategy', () => {
       return <div data-testid={id}>content</div>;
     };
 
-    const { getByTestId } = render(<Component />);
+    const { getByTestId } = render(
+      <IdManagerProvider>
+        <Component />
+      </IdManagerProvider>
+    );
     expect(getByTestId('id-0001')).toBeInTheDocument();
   });
 
-  test('should work with IdProvider context', () => {
+  test('should work with IdManagerProvider context', () => {
     const Component: React.FC = () => {
       const id = useIdWithStrategy(zeroPaddedStrategy(3), 'ctx-');
       return <div data-testid={id}>content</div>;
     };
 
+    const manager = new IdManager();
     const { container } = render(
-      <IdProvider prefix="p-">
+      <IdManagerProvider manager={manager}>
         <Component />
-      </IdProvider>
+      </IdManagerProvider>
     );
 
     const div = container.querySelector('div[data-testid]')!;
-    expect(div.getAttribute('data-testid')).toMatch(/^ctx-\d+$/);
+    expect(div.getAttribute('data-testid')).toBe('ctx-001');
   });
-});
 
-describe('resetStrategyCounter', () => {
-  test('should reset the counter to 0', () => {
-    generateIdWithStrategy(numericStrategy);
-    generateIdWithStrategy(numericStrategy);
-    expect(getStrategyCounter()).toBe(2);
+  test('should work without provider (fallback)', () => {
+    const Component: React.FC = () => {
+      const id = useIdWithStrategy(numericStrategy, 'fb-');
+      return <div data-testid={id}>content</div>;
+    };
 
-    resetStrategyCounter();
-    expect(getStrategyCounter()).toBe(0);
+    const { getByTestId } = render(<Component />);
+    expect(getByTestId('fb-1')).toBeInTheDocument();
+  });
 
-    expect(generateIdWithStrategy(numericStrategy)).toBe('1');
+  test('should accept reactId as counter seed', () => {
+    const Component: React.FC = () => {
+      const id = useIdWithStrategy(numericStrategy, 'r-', '', ':r10:');
+      return <div data-testid={id}>content</div>;
+    };
+
+    const { getByTestId } = render(
+      <IdManagerProvider>
+        <Component />
+      </IdManagerProvider>
+    );
+    expect(getByTestId('r-10')).toBeInTheDocument();
   });
 });

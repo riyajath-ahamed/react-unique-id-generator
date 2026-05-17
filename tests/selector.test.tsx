@@ -1,10 +1,7 @@
 import React, { useRef } from 'react';
 import { render, waitFor } from '@testing-library/react';
-import {
-  generateSelector,
-  useStableSelector,
-  resetSelectorCache,
-} from '../lib/selector';
+import { generateSelector } from '../lib/selector';
+import { useStableSelector } from '../lib/react/use-stable-selector';
 
 function createDOM(html: string): { container: HTMLDivElement; cleanup: () => void } {
   const container = document.createElement('div');
@@ -425,11 +422,5 @@ describe('useStableSelector', () => {
 
     const { getByTestId } = render(<Component />);
     expect(getByTestId('selector-output').textContent).toBe('null');
-  });
-});
-
-describe('resetSelectorCache', () => {
-  test('should be callable without error', () => {
-    expect(() => resetSelectorCache()).not.toThrow();
   });
 });

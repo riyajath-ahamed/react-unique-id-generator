@@ -1,78 +1,112 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import {
-  generateAutomationId,
-  resetAutomationCounter,
-  useAutomationId,
-  AutomationIdPool,
-} from '../lib/automation';
+import { generateAutomationId } from '../lib/automation';
+import { AutomationIdPool } from '../lib/automation-pool';
+import { IdManager, createIdManager } from '../lib/core/id-manager';
+import { useAutomationId } from '../lib/react/use-automation-id';
+import { IdManagerProvider } from '../lib/react/context';
+import { _resetFallbackManager } from '../lib/react/use-automation-id';
+
+afterEach(() => {
+  _resetFallbackManager();
+});
 
 describe('generateAutomationId', () => {
+  let manager: IdManager;
+
   beforeEach(() => {
-    resetAutomationCounter();
+    manager = createIdManager();
   });
 
   test('should generate sequential automation IDs', () => {
-    expect(generateAutomationId('Button')).toBe('Button-1');
-    expect(generateAutomationId('Button')).toBe('Button-2');
-    expect(generateAutomationId('Input')).toBe('Input-3');
+    expect(generateAutomationId(manager, 'Button')).toBe('Button-1');
+    expect(generateAutomationId(manager, 'Button')).toBe('Button-2');
+    expect(generateAutomationId(manager, 'Input')).toBe('Input-3');
   });
 
   test('should apply prefix', () => {
-    expect(generateAutomationId('Button', { prefix: 'test-' })).toBe('test-Button-1');
+    expect(generateAutomationId(manager, 'Button', { prefix: 'test-' })).toBe('test-Button-1');
   });
 
   test('should use custom separator', () => {
-    expect(generateAutomationId('Button', { separator: '_' })).toBe('Button_1');
+    expect(generateAutomationId(manager, 'Button', { separator: '_' })).toBe('Button_1');
   });
 
   test('should convert to kebab-case', () => {
-    expect(generateAutomationId('MyButton', { strategy: 'kebab-case' })).toBe('my-button-1');
-    expect(generateAutomationId('UserProfileCard', { strategy: 'kebab-case' })).toBe('user-profile-card-2');
+    expect(generateAutomationId(manager, 'MyButton', { strategy: 'kebab-case' })).toBe('my-button-1');
+    expect(generateAutomationId(manager, 'UserProfileCard', { strategy: 'kebab-case' })).toBe('user-profile-card-2');
   });
 
   test('should convert to camelCase', () => {
-    expect(generateAutomationId('my-button', { strategy: 'camelCase' })).toBe('myButton-1');
-    expect(generateAutomationId('user_profile_card', { strategy: 'camelCase' })).toBe('userProfileCard-2');
+    expect(generateAutomationId(manager, 'my-button', { strategy: 'camelCase' })).toBe('myButton-1');
+    expect(generateAutomationId(manager, 'user_profile_card', { strategy: 'camelCase' })).toBe('userProfileCard-2');
   });
 
   test('should use custom function', () => {
     const customFn = (name: string, index: number) => `custom_${name}_${index}`;
-    expect(generateAutomationId('Button', { strategy: 'custom', customFn })).toBe('custom_Button_1');
+    expect(generateAutomationId(manager, 'Button', { strategy: 'custom', customFn })).toBe('custom_Button_1');
   });
 
   test('should throw when custom strategy has no customFn', () => {
-    expect(() => generateAutomationId('Button', { strategy: 'custom' })).toThrow(
+    expect(() => generateAutomationId(manager, 'Button', { strategy: 'custom' })).toThrow(
       'customFn is required'
     );
   });
 
   test('should combine prefix with kebab-case', () => {
     expect(
-      generateAutomationId('MyComponent', {
+      generateAutomationId(manager, 'MyComponent', {
         strategy: 'kebab-case',
         prefix: 'qa-',
         separator: '--',
       })
     ).toBe('qa-my-component--1');
   });
+
+  test('should use separate counters per manager', () => {
+    const m1 = createIdManager();
+    const m2 = createIdManager();
+    expect(generateAutomationId(m1, 'A')).toBe('A-1');
+    expect(generateAutomationId(m2, 'A')).toBe('A-1');
+    expect(generateAutomationId(m1, 'A')).toBe('A-2');
+  });
+
+  describe('with reactId', () => {
+    test('should use reactId as counter seed', () => {
+      expect(generateAutomationId(manager, 'Btn', {}, ':r5:')).toBe('Btn-5');
+    });
+
+    test('should not increment manager counter when reactId is used', () => {
+      generateAutomationId(manager, 'Btn', {}, ':r5:');
+      expect(manager.getAutomationCounter()).toBe(0);
+    });
+
+    test('should fall back to counter for unparseable reactId', () => {
+      expect(generateAutomationId(manager, 'Btn', {}, 'abc')).toBe('Btn-1');
+      expect(manager.getAutomationCounter()).toBe(1);
+    });
+  });
 });
 
 describe('useAutomationId', () => {
-  beforeEach(() => {
-    resetAutomationCounter();
-  });
-
   test('should generate a stable automation ID', () => {
     const Component: React.FC<{ value: number }> = ({ value }) => {
       const testId = useAutomationId('LoginButton');
       return <button data-testid={testId}>{value}</button>;
     };
 
-    const { getByTestId, rerender } = render(<Component value={1} />);
+    const { getByTestId, rerender } = render(
+      <IdManagerProvider>
+        <Component value={1} />
+      </IdManagerProvider>
+    );
     expect(getByTestId('LoginButton-1')).toBeInTheDocument();
 
-    rerender(<Component value={2} />);
+    rerender(
+      <IdManagerProvider>
+        <Component value={2} />
+      </IdManagerProvider>
+    );
     expect(getByTestId('LoginButton-1')).toBeInTheDocument();
   });
 
@@ -88,10 +122,10 @@ describe('useAutomationId', () => {
     };
 
     const { getByTestId } = render(
-      <div>
+      <IdManagerProvider>
         <ButtonA />
         <ButtonB />
-      </div>
+      </IdManagerProvider>
     );
 
     expect(getByTestId('Submit-1')).toBeInTheDocument();
@@ -104,8 +138,22 @@ describe('useAutomationId', () => {
       return <div data-testid={testId}>content</div>;
     };
 
-    const { getByTestId } = render(<Component />);
+    const { getByTestId } = render(
+      <IdManagerProvider>
+        <Component />
+      </IdManagerProvider>
+    );
     expect(getByTestId('user-profile-1')).toBeInTheDocument();
+  });
+
+  test('should work without provider (fallback)', () => {
+    const Component: React.FC = () => {
+      const testId = useAutomationId('FallbackTest');
+      return <div data-testid={testId}>content</div>;
+    };
+
+    const { getByTestId } = render(<Component />);
+    expect(getByTestId('FallbackTest-1')).toBeInTheDocument();
   });
 });
 
@@ -124,8 +172,8 @@ describe('AutomationIdPool', () => {
 
   test('should auto-expand when pool is exhausted', () => {
     const pool = new AutomationIdPool(2, 'item');
-    pool.acquire(); // item-1
-    pool.acquire(); // item-2
+    pool.acquire();
+    pool.acquire();
     expect(pool.acquire()).toBe('item-3');
   });
 
@@ -134,7 +182,6 @@ describe('AutomationIdPool', () => {
     const id1 = pool.acquire();
     pool.acquire();
     pool.release(id1);
-
     expect(pool.acquire()).toBe(id1);
   });
 
